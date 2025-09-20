@@ -5,7 +5,7 @@ public class GripReaper extends Character{
     }
 
     @Override
-    public int useSkill(){ // 40%확률로 상대 즉결 처형 or 3데미지
+    public int useSkill(){ // 40%확률로 상대 즉결 처형 or 2 데미지
         if(Math.random()<0.4){
             System.out.println("*#*# 즉결 처형 발동...!");
             return 99999;

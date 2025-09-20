@@ -1,16 +1,13 @@
 import java.util.Scanner;
 
 public class Play {
-    private static String actionName(int code) {
-        switch (code) {
-            case 1: return "공격";
-            case 2: return "방어";
-            case 3: return "에너지 모으기";
-            case 4: return "필살기";
-            case 5: return "히든 필살기";
-            default: return "알 수 없음";
-        }
-    }
+    ActionState attack = ActionState.ATTACK;
+    ActionState defense = ActionState.DEFENSE;
+    ActionState hiddenSkill = ActionState.HIDDEN_SKILL;
+    ActionState specialSkill = ActionState.SPECIAL_SKILL;
+    ActionState chargeEnergy = ActionState.CHARGE_ENERGY;
+
+
     private int setComputerChoice(Character com){
         if(com.getEnergy()>0){
             return (int)(Math.random() * 3) + 1;
@@ -39,7 +36,7 @@ public class Play {
         System.out.println();
         //시작 세팅
         Character player,computer;
-        if(character ==1){
+        if(character == 1){
             player = new BasicCharacter(playerName,10,1,1);
         }
         else if(character ==2){
@@ -62,11 +59,11 @@ public class Play {
             playerHp = player.getHp();
             computerEnergy = computer.getEnergy();
             computerHp = computer.getHp();
-            if(computer.getHp()<0){
+            if(computer.getHp()<=0){
                 System.out.println(playerName +" 승리!!!");
                 break;
             }
-            if(player.getHp()<0){
+            if(player.getHp()<=0){
                 System.out.println("computer(AI)"+" 승리!!!");
                 break;
             }
@@ -88,11 +85,11 @@ public class Play {
                 System.out.print("다음 행동 선택 >>");
                 choice = scan.nextInt();
                 scan.nextLine();
-                if(choice==5&&!player.getHasHidden()){
+                if(choice==hiddenSkill.getCode()&&!player.hasHidden()){
                     System.out.println("해당 캐릭터는 히든 필살기가 없습니다!");
                     continue;
                 }
-                if(choice==1&&player.getEnergy()<1){
+                if(choice==attack.getCode()&&player.getEnergy()<1){
                     System.out.println("에너지가 부족합니다! 기를 모으세요.");
                     continue;
                 }
@@ -103,29 +100,29 @@ public class Play {
             playerState = player.getState();
             System.out.println("==============================================");
             System.out.println(round + " 라운드 전투 결과");
-            System.out.println("플레이어 선택: [" + playerState + "] " + actionName(playerState));
-            System.out.println("컴퓨터   선택: [" + computerState + "] " + actionName(computerState));
+            System.out.println("플레이어 선택: [" + playerState + "] " + ActionState.getDescriptionByCode(playerState));
+            System.out.println("컴퓨터   선택: [" + computerState + "] " + ActionState.getDescriptionByCode(computerState));
             System.out.println("==============================================");
 
-            if(computerState==1){// 컴퓨터 공격 경우
-                if(playerState!=2)player.setHp(playerHp-computer.getDamage());
+            if(computerState==attack.getCode()){// 컴퓨터 공격 경우
+                if(playerState!=defense.getCode())player.setHp(playerHp-computer.getDamage());
                 computer.useEnergy();
             }
-            else if(computerState==3){ // 컴퓨터 에너지 충전 경우
+            else if(computerState==chargeEnergy.getCode()){ // 컴퓨터 에너지 충전 경우
                 computer.chargeEnergy();
             }
-            if(playerState==1){//플레이어 공격
-                if(computerState!=2)computer.setHp(computerHp-player.getDamage());
+            if(playerState==attack.getCode()){//플레이어 공격
+                if(computerState!=defense.getCode())computer.setHp(computerHp-player.getDamage());
                 player.useEnergy();
             }
-            else if(playerState==3){
+            else if(playerState==chargeEnergy.getCode()){
                 player.chargeEnergy();
             }
-            else if(playerState==4){
-                if(computerState!=2)computer.setHp(computerHp-player.useSkill());
+            else if(playerState==specialSkill.getCode()){
+                if(computerState!=defense.getCode())computer.setHp(computerHp-player.useSkill());
             }
-            else if(playerState ==5){
-                if(computerState!=2)computer.setHp(computerHp-player.hidden());
+            else if(playerState ==hiddenSkill.getCode()){
+                if(computerState!=defense.getCode())computer.setHp(computerHp-player.hidden());
             }
 
 

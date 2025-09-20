@@ -3,15 +3,13 @@
         private int hp;
         private int energy;
         private int damage;
-        private int state; //1-공격 2-방어 3-기모으기 4-필살기(에너지 3개사용) 5-히든 필살기(superman만 사용가능)
         private boolean hasHidden;
+        private int state;
         public Character(String name, int hp, int energy, int damage) {
             this.name = name;
             this.hp = hp;
             this.energy = energy;
             this.damage = damage;
-
-
         }
 
         public void setHp(int hp){
@@ -22,10 +20,9 @@
             this.hasHidden = hasHidden;
         }
 
-        public void setState(int state){
+        public void setState(int state) {
             this.state = state;
         }
-
         public String getName() {
             return name;
         }
@@ -40,15 +37,14 @@
         public int getEnergy(){
             return energy;
         }
-        public boolean getHasHidden(){
+        public boolean hasHidden(){
             return hasHidden;
         }
 
         public void chargeEnergy(){
             energy++;
         }
-
-        public int getState(){
+        public int getState() {
             return state;
         }
         public abstract int useSkill(); //스킬 사용 이후 최종 데미지를 반환
