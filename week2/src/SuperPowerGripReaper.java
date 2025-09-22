@@ -1,8 +1,8 @@
 import java.util.Scanner;
 
 public class SuperPowerGripReaper extends GripReaper{
-    public SuperPowerGripReaper(String name, int hp, int energy, int damage) {
-        super(name, hp, energy, damage);
+    public SuperPowerGripReaper(String name, int hp, int energy, int damage,Scanner scan) {
+        super(name, hp, energy, damage,scan);
         setHasHidden(true);
     }
     @Override
@@ -12,7 +12,6 @@ public class SuperPowerGripReaper extends GripReaper{
         System.out.println("2. 무딘 칼");
         System.out.println("3. 레이저 건");
         System.out.print("번호 입력 >> ");
-        Scanner scan = new Scanner(System.in);
         int choice  = scan.nextInt();
         if(choice==1)return 7;
         else if(choice==2) return 4;

@@ -1,15 +1,19 @@
-    public abstract class  Character {
+import java.util.Scanner;
+
+public abstract class  Character {
         private String name;
         private int hp;
         private int energy;
         private int damage;
         private boolean hasHidden;
         private int state;
-        public Character(String name, int hp, int energy, int damage) {
+        protected Scanner scan;
+        public Character(String name, int hp, int energy, int damage,Scanner scan) {
             this.name = name;
             this.hp = hp;
             this.energy = energy;
             this.damage = damage;
+            this.scan = scan;
         }
 
         public void setHp(int hp){

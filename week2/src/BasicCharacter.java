@@ -1,6 +1,8 @@
+import java.util.Scanner;
+
 public class BasicCharacter extends Character{
-    public BasicCharacter(String name, int hp, int energy, int damage) {
-        super(name, hp, energy, damage);
+    public BasicCharacter(String name, int hp, int energy, int damage, Scanner scan) {
+        super(name, hp, energy, damage,scan);
     }
     @Override
     public int useSkill(){ //스킬 사용 이후 최종 데미지를 반환

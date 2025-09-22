@@ -14,9 +14,8 @@ public class Play {
         }
         else return (int)(Math.random() * 2) + 2;
     }
-    Scanner scan = new Scanner(System.in);
     Contents con = new Contents();
-    public void start(){
+    public void start(Timer timer, Scanner scan){
         con.startContents();
         System.out.println("플레이어 이름을 입력하세요:");
         System.out.print("이름: ");
@@ -37,13 +36,13 @@ public class Play {
         //시작 세팅
         Character player,computer;
         if(character == 1){
-            player = new BasicCharacter(playerName,10,1,1);
+            player = new BasicCharacter(playerName,10,1,1,scan);
         }
         else if(character ==2){
-            player = new GripReaper(playerName,10,1,1);
+            player = new GripReaper(playerName,10,1,1,scan);
         }
-        else player = new SuperPowerGripReaper(playerName,10,1,1);
-        computer = new BasicCharacter("computer(AI)",10,1, difficult);
+        else player = new SuperPowerGripReaper(playerName,10,1,1,scan);
+        computer = new BasicCharacter("computer(AI)",10,1, difficult,scan);
         int round = 0;
         int playerEnergy;
         int playerHp;
@@ -67,6 +66,7 @@ public class Play {
                 System.out.println("computer(AI)"+" 승리!!!");
                 break;
             }
+            System.out.println("이번 게임을 시작한지: "+timer.getTime()+"초");
             System.out.println("==============================================");
             System.out.println(round + " 라운드 전투 시작!");
             System.out.println("----------------------------------------------");

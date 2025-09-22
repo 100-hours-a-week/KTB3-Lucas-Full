@@ -5,7 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6f29d0b8-849f-44af-b0c5-f0231bfdd77e" name="변경" comment="">
+      <change afterPath="$PROJECT_DIR$/week2/src/Timer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/.idea/IntelliLang.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/Assignment.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/src/ActionState.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/src/BasicCharacter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/src/Character.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/src/Contents.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/src/GripReaper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/src/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/src/Play.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/week1/src/SuperPowerGripReaper.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,7 +94,7 @@
       <workItem from="1757636328139" duration="14356000" />
       <workItem from="1758177406570" duration="34000" />
       <workItem from="1758182682819" duration="626000" />
-      <workItem from="1758269744100" duration="6032000" />
+      <workItem from="1758269744100" duration="12883000" />
     </task>
     <servers />
   </component>

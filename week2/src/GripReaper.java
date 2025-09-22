@@ -1,7 +1,9 @@
+import java.util.Scanner;
+
 public class GripReaper extends Character{
 
-    public GripReaper(String name, int hp, int energy, int damage) {
-        super(name, hp, energy, damage);
+    public GripReaper(String name, int hp, int energy, int damage,Scanner scan) {
+        super(name, hp, energy, damage,scan);
     }
 
     @Override
@@ -15,4 +17,6 @@ public class GripReaper extends Character{
             return 2;
         }
     }
+
+
 }
