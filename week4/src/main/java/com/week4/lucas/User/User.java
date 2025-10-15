@@ -1,0 +1,14 @@
+package com.week4.lucas.User;
+
+import lombok.*;
+
+@Getter @Setter @Builder
+@AllArgsConstructor @NoArgsConstructor
+
+public class User {
+    private Long id;
+    private String email;
+    private String password;
+    private String nickname;
+    private String profile_image; // nullable
+}
