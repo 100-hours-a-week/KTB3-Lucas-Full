@@ -1,4 +1,4 @@
-package com.week4.lucas.User;
+package com.week5.lucas.User;
 
 import org.springframework.stereotype.Repository;
 

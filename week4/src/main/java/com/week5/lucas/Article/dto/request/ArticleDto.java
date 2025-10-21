@@ -1,29 +1,30 @@
-package com.week4.lucas.Article;
+package com.week5.lucas.Article.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class ArticleDto {
-
+    @Schema(name = "글 생성 요청")
     public record CreateArticleReq(
-            @NotNull Integer user_id,
+            @NotNull Integer userId,
             @NotBlank String title,
             @NotBlank String content,
-            @NotBlank String file_name
+            @NotBlank String fileName
     ) {}
-
+    @Schema(name = "글 수정 요청")
     public record EditArticleReq(
-            @NotNull Integer user_id,
+            @NotNull Integer userId,
             String title,
             String content,
-            String file_name
+            String fileName
     ) {}
-
+    @Schema(name = "댓글 생성 요청")
     public record CreateCommentReq(
-            @NotNull Integer user_id,
+            @NotNull Integer userId,
             @NotBlank String content
     ) {}
-
+    @Schema(name = "댓글 수정 요청")
     public record EditCommentReq(
             @NotBlank String content
     ) {}

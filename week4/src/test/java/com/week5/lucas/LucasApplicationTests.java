@@ -1,4 +1,4 @@
-package com.week4.lucas;
+package com.week5.lucas;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

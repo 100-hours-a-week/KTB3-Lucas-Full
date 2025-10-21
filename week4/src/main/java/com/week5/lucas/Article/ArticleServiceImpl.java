@@ -1,6 +1,7 @@
-package com.week4.lucas.Article;
+package com.week5.lucas.Article;
 
 
+import com.week5.lucas.Article.dto.request.ArticleDto;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -37,11 +38,11 @@ public class ArticleServiceImpl implements ArticleService {
     public Article edit(Long articleId, ArticleDto.EditArticleReq req) throws ForbiddenException {
         Article a = repo.findArticle(articleId);
         if (a == null) return null;
-        if (!Objects.equals(a.getUser_id(), req.user_id())) throw new ForbiddenException();
+        if (!Objects.equals(a.getUserId(), req.userId())) throw new ForbiddenException();
 
         if (StringUtils.hasText(req.title())) a.setTitle(req.title());
         if (StringUtils.hasText(req.content())) a.setContent(req.content());
-        if (StringUtils.hasText(req.file_name())) a.setFile_name(req.file_name());
+        if (StringUtils.hasText(req.fileName())) a.setFileName(req.fileName());
         return a;
     }
 
@@ -60,7 +61,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Comment editComment(Long articleId, Long commentId, ArticleDto.EditCommentReq req) {
         Comment c = repo.findComment(commentId);
-        if (c == null || !Objects.equals(c.getArticle_id(), articleId)) return null;
+        if (c == null || !Objects.equals(c.getArticleId(), articleId)) return null;
         c.setContent(req.content());
         return c;
     }
@@ -68,7 +69,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public boolean deleteComment(Long articleId, Long commentId) {
         Comment c = repo.findComment(commentId);
-        if (c == null || !Objects.equals(c.getArticle_id(), articleId)) return false;
+        if (c == null || !Objects.equals(c.getArticleId(), articleId)) return false;
         return repo.deleteComment(commentId);
     }
 

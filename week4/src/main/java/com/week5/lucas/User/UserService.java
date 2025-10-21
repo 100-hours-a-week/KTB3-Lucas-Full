@@ -1,4 +1,6 @@
-package com.week4.lucas.User;
+package com.week5.lucas.User;
+
+import com.week5.lucas.User.dto.request.UserDto;
 
 public interface UserService {
     Long signup(UserDto dto);

@@ -1,4 +1,6 @@
-package com.week4.lucas.Article;
+package com.week5.lucas.Article;
+
+import com.week5.lucas.Article.dto.request.ArticleDto;
 
 import java.util.List;
 
