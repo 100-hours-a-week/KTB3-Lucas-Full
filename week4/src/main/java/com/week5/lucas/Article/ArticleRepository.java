@@ -1,4 +1,4 @@
-package com.week4.lucas.Article;
+package com.week5.lucas.Article;
 
 
 import org.springframework.stereotype.Repository;
@@ -28,7 +28,7 @@ public class ArticleRepository {
 
     public List<Article> findPage(int page, int size){
         return articles.values().stream()
-                .sorted(Comparator.comparing(Article::getCreated_at).reversed())
+                .sorted(Comparator.comparing(Article::getCreatedAt).reversed())
                 .skip((long) (page - 1) * size)
                 .limit(size)
                 .collect(Collectors.toList());
@@ -58,14 +58,14 @@ public class ArticleRepository {
 
     public List<Comment> findCommentsByArticle(Long articleId){
         return comments.values().stream()
-                .filter(c -> Objects.equals(c.getArticle_id(), articleId))
-                .sorted(Comparator.comparing(Comment::getCreated_at))
+                .filter(c -> Objects.equals(c.getArticleId(), articleId))
+                .sorted(Comparator.comparing(Comment::getCreatedAt))
                 .collect(Collectors.toList());
     }
 
     public int countCommentsByArticle(Long articleId){
         return (int) comments.values().stream()
-                .filter(c -> Objects.equals(c.getArticle_id(), articleId))
+                .filter(c -> Objects.equals(c.getArticleId(), articleId))
                 .count();
     }
 }

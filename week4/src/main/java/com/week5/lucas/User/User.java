@@ -1,4 +1,4 @@
-package com.week4.lucas.User;
+package com.week5.lucas.User;
 
 import lombok.*;
 
@@ -10,5 +10,5 @@ public class User {
     private String email;
     private String password;
     private String nickname;
-    private String profile_image; // nullable
+    private String profileImage; // nullable
 }

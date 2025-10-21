@@ -1,4 +1,6 @@
-package com.week4.lucas.User;
+package com.week5.lucas.User;
+
+import com.week5.lucas.User.dto.request.UserDto;
 
 public class UserMapper {
     public static User toEntity(UserDto dto) {
@@ -6,7 +8,7 @@ public class UserMapper {
                 .email(dto.email())
                 .password(dto.password())
                 .nickname(dto.nickname())
-                .profile_image(dto.profile_image())
+                .profileImage(dto.profileImage())
                 .build();
     }
 }
