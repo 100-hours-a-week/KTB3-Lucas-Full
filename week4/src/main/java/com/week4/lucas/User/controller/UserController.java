@@ -1,15 +1,18 @@
-package com.week4.lucas.User;
+package com.week4.lucas.User.controller;
 
 import com.week4.lucas.User.dto.response.ApiResponse;
 import com.week4.lucas.User.dto.request.LoginRequest;
-import com.week4.lucas.User.dto.request.UserDto;
+import com.week4.lucas.User.dto.request.UserReq;
 import com.week4.lucas.User.dto.response.LoginSuccess;
 import com.week4.lucas.User.dto.response.LoginUser;
 import com.week4.lucas.User.dto.response.SignupResult;
+import com.week4.lucas.User.entity.User;
+import com.week4.lucas.User.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.message.SimpleMessage;
 import org.springframework.http.*;
 import org.springframework.util.StringUtils;
@@ -21,15 +24,15 @@ import java.util.UUID;
 @Tag(name = "User", description = "User API")
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService service;
-    public UserController(UserService service) { this.service = service; }
 
     // 회원가입
     @Operation(summary = "회원가입")
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<SignupResult>> signup(@Valid @RequestBody UserDto dto) {
+    public ResponseEntity<ApiResponse<SignupResult>> signup(@Valid @RequestBody UserReq dto) {
         Long id = service.signup(dto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok("register_success", new SignupResult(id)));
@@ -42,16 +45,22 @@ public class UserController {
         User u = service.get(id);
         return ResponseEntity.ok(ApiResponse.ok("ok", u));
     }
+
+    // 로그인
     @Operation(summary = "로그인")
     @PostMapping("/login")
     public ResponseEntity<LoginSuccess> login(@Valid @RequestBody LoginRequest req) {
+        // 실패시 UnauthorizedException
+        User u = service.login(req.email(), req.password());
 
-        User u = service.login(req.email(), req.password()); // 401 발생 시 아래 Advice가 처리
-        String token = UUID.randomUUID().toString().replace("-", ""); // 임시 토큰
+        String token = UUID.randomUUID().toString().replace("-", ""); // 토큰생성
         service.registerToken(token, u.getId());
-        LoginUser user = new LoginUser(u.getId(), u.getNickname()); // user_name = nickname
+
+        LoginUser user = new LoginUser(u.getId(), u.getName()); // nickname 대신 name 사용
         return ResponseEntity.ok(new LoginSuccess("login_success", token, user));
     }
+
+
     @Operation(summary = "로그아웃")
     @SecurityRequirement(name = "BearerAuth")
     @PostMapping("/logout")
