@@ -19,28 +19,29 @@ public class CommentServiceImpl implements CommentService {
     private final EntityManager em;
     private final CommentRepository commentRepo;
     @Override
-    public CommentRes createComment(Long articleId, CommentReq.CreateCommentReq req) {
+    public CommentRes createComment(Long articleId, Long userId, CommentReq.CreateCommentReq req) {
         Article articleRef = em.getReference(Article.class, articleId);
-        User userRef = em.getReference(User.class, req.userId());
+        User userRef = em.getReference(User.class, userId);
 
         Comment c = commentRepo.save(CommentMapper.toEntity(articleRef, userRef, req));
         return CommentMapper.toRes(c);
     }
 
     @Override
-    public CommentRes editComment(Long articleId, Long commentId, CommentReq.EditCommentReq req) {
+    public CommentRes editComment(Long articleId, Long commentId, Long userId, CommentReq.EditCommentReq req) {
         Comment c = commentRepo.findById(commentId).orElse(null);
         if (c == null || !c.getArticle().getId().equals(articleId)) return null;
-        if (!c.getUser().getId().equals(req.userId())) return null; // 권한 체크(간단버전)
+        if (!c.getUser().getId().equals(userId)) return null; // 권한 체크(간단버전)
 
         c.edit(req.content()); // 더티체킹으로 UPDATE
         return CommentMapper.toRes(c);
     }
 
     @Override
-    public boolean deleteComment(Long articleId, Long commentId) {
+    public boolean deleteComment(Long articleId, Long commentId, Long userId) {
         Comment c = commentRepo.findById(commentId).orElse(null);
         if (c == null || !c.getArticle().getId().equals(articleId)) return false;
+        if (!c.getUser().getId().equals(userId)) return false;
 
         c.softDelete(); // 소프트 삭제
         return true;

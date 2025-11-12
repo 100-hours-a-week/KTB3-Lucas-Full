@@ -5,9 +5,9 @@ import com.week4.lucas.Comment.dto.response.CommentRes;
 
 public interface CommentService {
 
-    CommentRes createComment(Long articleId, CommentReq.CreateCommentReq req);
+    CommentRes createComment(Long articleId, Long userId, CommentReq.CreateCommentReq req);
 
-    CommentRes editComment(Long articleId, Long commentId, CommentReq.EditCommentReq req);
+    CommentRes editComment(Long articleId, Long commentId, Long userId, CommentReq.EditCommentReq req);
 
-    boolean deleteComment(Long articleId, Long commentId);
+    boolean deleteComment(Long articleId, Long commentId, Long userId);
 }

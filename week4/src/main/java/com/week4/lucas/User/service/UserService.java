@@ -14,5 +14,7 @@ public interface UserService {
 
     void logout(String token);
 
+    Long resolveUserIdByToken(String token);
+
     class UnauthorizedException extends RuntimeException { }
 }

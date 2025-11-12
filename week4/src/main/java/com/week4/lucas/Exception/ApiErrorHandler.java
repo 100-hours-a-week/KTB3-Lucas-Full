@@ -1,6 +1,7 @@
 package com.week4.lucas.Exception;
 
 import com.week4.lucas.User.dto.response.ApiResponse;
+import com.week4.lucas.User.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,6 +16,12 @@ public class ApiErrorHandler {
     public ResponseEntity<ApiResponse<Void>> handleBadRequest(Exception e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error("invalid_request"));
+    }
+
+    @ExceptionHandler(UserService.UnauthorizedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUnauthorized(UserService.UnauthorizedException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error("unauthorized"));
     }
 
     @ExceptionHandler(Exception.class)

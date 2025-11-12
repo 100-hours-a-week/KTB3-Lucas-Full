@@ -33,12 +33,11 @@ public class ArticleMapper {
         );
     }
 
-    public static ArticleDetailRes toArticleDetail(Article a) {
+    public static ArticleDetailRes toArticleDetail(Article a,boolean likedByMe) {
         String authorName = a.getUser() != null ? a.getUser().getName() : null;
         String authorImg  = a.getUser() != null ? a.getUser().getProfileImage() : null;
         return new ArticleDetailRes(
                 a.getId(),
-                a.getUser(),
                 a.getTitle(),
                 a.getContent(),
                 a.getLikeCount(),
@@ -46,7 +45,8 @@ public class ArticleMapper {
                 a.getCommentCount(),
                 a.getArticleCreatedAt(),
                 a.getArticleEditedAt(),
-                new AuthorRes(authorName, authorImg)
+                new AuthorRes(authorName, authorImg),
+                likedByMe
         );
     }
 

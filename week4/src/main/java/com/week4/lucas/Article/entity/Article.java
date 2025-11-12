@@ -50,11 +50,11 @@ public class Article {
 
     @Column(name = "article_created_at")
     @CreatedDate
-    private LocalDateTime ArticleCreatedAt;
+    private LocalDateTime articleCreatedAt;
 
     @LastModifiedDate
     @Column(name = "article_edited_at")
-    private LocalDateTime ArticleEditedAt;
+    private LocalDateTime articleEditedAt;
 
     @Column
     @Builder.Default

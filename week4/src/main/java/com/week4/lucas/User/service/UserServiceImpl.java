@@ -82,5 +82,13 @@ public class UserServiceImpl implements UserService {
         }
         activeTokens.remove(token);
     }
-}
 
+    @Override
+    public Long resolveUserIdByToken(String token) {
+        Long userId = activeTokens.get(token);
+        if (userId == null) {
+            throw new UnauthorizedException();
+        }
+        return userId;
+    }
+}

@@ -1,6 +1,8 @@
 package com.week4.lucas.Article.service;
 
 
+import com.week4.lucas.Article.dto.response.ArticleDetailRes;
+import com.week4.lucas.Article.dto.response.ArticleSummaryRes;
 import com.week4.lucas.Article.mapper.ArticleMapper;
 import com.week4.lucas.Article.Likes.entity.Likes;
 import com.week4.lucas.Article.Likes.repository.LikesRepository;
@@ -31,6 +33,7 @@ public class ArticleServiceImpl implements ArticleService {
     private final UserRepository userRepo;
     private final CommentRepository commentRepo;
 
+    @Transactional
     @Override
     public List<Article> list(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "articleCreatedAt"));
@@ -39,34 +42,37 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Transactional
     @Override
-    public Article create(ArticleReq.CreateArticleReq req) {
-        User user = userRepo.findById(req.userId())
+    public Article create(Long userId, ArticleReq.CreateArticleReq req) {
+        User user = userRepo.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        return articleRepo.save(ArticleMapper.toEntity(user,req));
+        return articleRepo.save(ArticleMapper.toEntity(user, req));
     }
     @Transactional
     @Override
-    public Article detail(Long articleId, boolean increaseViews) {
-        Article a = articleRepo.findById(articleId).orElse(null);
-        if (a == null) return null;
-        if (increaseViews) a.increaseView();
-        a.setLikeCount(likesRepo.countByArticleId(articleId));
-        a.setCommentCount(commentRepo.countByArticleId(articleId));
-        return a;
+    public ArticleDetailRes detail(Long userId,Long articleId, boolean increaseViews) {
+        Article article = articleRepo.findById(articleId).orElse(null);
+        if (article == null) return null;
+        if (increaseViews) article.increaseView();
+        article.setLikeCount(likesRepo.countByArticleId(articleId));
+        article.setCommentCount(commentRepo.countByArticleId(articleId));
+        boolean likedByMe = likesRepo.existsByArticleIdAndUserId(articleId,userId); //내가 좋아요를 눌렀는지
+        return ArticleMapper.toArticleDetail(article,likedByMe); //DTO 반환
     }
 
     @Transactional
     @Override
-    public Article edit(Long articleId, ArticleReq.EditArticleReq req) throws ForbiddenException {
-        Article a = articleRepo.findById(articleId).orElse(null);
-        if (a == null) return null;
-        //본인 확인
-        if (!Objects.equals(a.getUser().getId(), req.userId())) throw new ForbiddenException();
-        if (req.title() != null) a.setTitle(req.title());
-        if (req.content() != null) a.setContent(req.content());
-        return a;
+    public ArticleDetailRes edit(Long articleId, Long userId, ArticleReq.EditArticleReq req) throws ForbiddenException {
+        Article article = articleRepo.findById(articleId).orElse(null);
+        if (article == null) return null;
+        //본인이 작성한 글이 맞는지 확인
+        if (!Objects.equals(article.getUser().getId(), userId)) throw new ForbiddenException();
+        if (req.title() != null) article.setTitle(req.title());
+        if (req.content() != null) article.setContent(req.content());
+        boolean likedByMe = likesRepo.existsByArticleIdAndUserId(articleId,userId); //내가 좋아요를 눌렀는지
+        return ArticleMapper.toArticleDetail(article,likedByMe) ;
     }
-
+    
+    @Transactional
     @Override
     public boolean delete(Long articleId) {
 

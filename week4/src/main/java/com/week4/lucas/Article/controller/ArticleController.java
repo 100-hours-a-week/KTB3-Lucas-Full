@@ -4,6 +4,7 @@ import com.week4.lucas.Article.mapper.ArticleMapper;
 import com.week4.lucas.Article.service.ArticleService;
 import com.week4.lucas.Article.dto.request.ArticleReq;
 import com.week4.lucas.Article.dto.response.ApiResponse;
+import com.week4.lucas.User.support.AuthTokenResolver;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -11,8 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @Tag(name = "Article", description = "Article API")
 @RestController
@@ -21,6 +21,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class ArticleController {
 
     private final ArticleService service;
+    private final AuthTokenResolver authTokenResolver;
 
 
 
@@ -30,40 +31,44 @@ public class ArticleController {
     public ResponseEntity<Object> list(@RequestParam(defaultValue = "1") int page) {
         if (page < 1)  return ResponseEntity.status(BAD_REQUEST).body(ApiResponse.error("invalid_request"));
         int size = 10;
-        var articles = service.list(page, size);
-        var posts = articles.stream().map(ArticleMapper::toSummary).toList();
-        return ResponseEntity.ok(ApiResponse.ok("post_list_success",posts));
+        var articles = service.list(page, size).stream().map(ArticleMapper::toSummary).toList();
+        return ResponseEntity.ok(ApiResponse.ok("post_list_success",articles));
     }
 
     // 작성 (201)
     @Operation(summary = "글 작성")
     @PostMapping("/articles")
-    public ResponseEntity<Object> create(@Valid @RequestBody ArticleReq.CreateArticleReq req) {
-        var a = service.create(req);
+    public ResponseEntity<Object> create(@RequestHeader(value = "Authorization", required = false) String authorization,
+                                         @Valid @RequestBody ArticleReq.CreateArticleReq req) {
+        Long userId = authTokenResolver.requireUserId(authorization);
+        var a = service.create(userId, req);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("post_created_success", a));
     }
 
     // 상세
     @Operation(summary = "게시글 조회")
     @GetMapping("/articles/{article_id}")
-    public ResponseEntity<Object> detail(@PathVariable("article_id") Long id) {
-        var a = service.detail(id, true);
-        if (a == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("not_found"));
+    public ResponseEntity<Object> detail(@RequestHeader(value = "Authorization", required = false) String authorization,
+                                         @PathVariable("article_id") Long articleId) {
+        Long userId = authTokenResolver.requireUserId(authorization);
+        var article = service.detail(userId,articleId, true);
+        if (article == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("not_found"));
 
-        return ResponseEntity.ok(ApiResponse.ok("post_detail_success",ArticleMapper.toArticleDetail(a)));
+        return ResponseEntity.ok(ApiResponse.ok("post_detail_success",article));
     }
 
     // 수정
     @Operation(summary = "게시글 수정")
     @PatchMapping("/articles/{article_id}")
     public ResponseEntity<Object> edit(@PathVariable("article_id") Long id,
+                                       @RequestHeader(value = "Authorization", required = false) String authorization,
                                        @Valid @RequestBody ArticleReq.EditArticleReq req) {
         try {
-            var a = service.edit(id, req);
-            if (a == null)  return ResponseEntity.status(NOT_FOUND).body(ApiResponse.error("Edited_failed"));
+            Long userId = authTokenResolver.requireUserId(authorization);
+            var editedArticle = service.edit(id, userId, req);
+            if (editedArticle == null)  return ResponseEntity.status(NOT_FOUND).body(ApiResponse.error("Edited_failed"));
 
-            var data = ArticleMapper.toArticleDetail(a);
-            return ResponseEntity.ok(ApiResponse.ok("Edited_success",data));
+            return ResponseEntity.ok(ApiResponse.ok("Edited_success",editedArticle));
         } catch (ArticleService.ForbiddenException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error("FORBIDDEN"));
         }
@@ -82,22 +87,24 @@ public class ArticleController {
 
     // 좋아요
     @Operation(summary = "좋아요")
-    @PostMapping("/articles/{article_id}/{user_id}/likes")
+    @PostMapping("/articles/{article_id}/likes")
     public ResponseEntity<Object> like(@PathVariable("article_id") Long article_id,
-                                       @PathVariable("user_id") Long user_id)
+                                       @RequestHeader(value = "Authorization", required = false) String authorization)
     {
-        boolean a = service.like(article_id,user_id);
-        if (!a) return ResponseEntity.status(NOT_FOUND).body(ApiResponse.error("like_failed"));
+        Long userId = authTokenResolver.requireUserId(authorization);
+        boolean isAction = service.like(article_id, userId);
+        if (!isAction) return ResponseEntity.status(CONFLICT).body(ApiResponse.error("이미 좋아요를 눌렀습니다."));
         return ResponseEntity.ok(ApiResponse.ok("like_success"));
     }
 
     //좋아요 취소
 
     @Operation(summary = "좋아요 취소")
-    @DeleteMapping("/articles/{article_id}/{user_id}/likes")
+    @DeleteMapping("/articles/{article_id}/likes")
     public ResponseEntity<Object> unlike(@PathVariable("article_id") Long article_id,
-                                         @PathVariable("user_id") Long user_id) {
-        boolean a = service.unlike(article_id,user_id);
+                                         @RequestHeader(value = "Authorization", required = false) String authorization) {
+        Long userId = authTokenResolver.requireUserId(authorization);
+        boolean a = service.unlike(article_id, userId);
         if (!a) return ResponseEntity.status(NOT_FOUND).body(ApiResponse.error("unlike_failed"));
         return ResponseEntity.ok(ApiResponse.ok("unlike_success"));
     }
