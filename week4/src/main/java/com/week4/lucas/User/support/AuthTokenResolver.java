@@ -22,4 +22,15 @@ public class AuthTokenResolver {
         }
         return userService.resolveUserIdByToken(token);
     }
+
+    public Long resolveUserIdIfPresent(String authorizationHeader) {
+        if (!StringUtils.hasText(authorizationHeader) || !authorizationHeader.startsWith(BEARER_PREFIX)) {
+            return null;
+        }
+        String token = authorizationHeader.substring(BEARER_PREFIX.length()).trim();
+        if (!StringUtils.hasText(token)) {
+            return null;
+        }
+        return userService.resolveUserIdByToken(token);
+    }
 }

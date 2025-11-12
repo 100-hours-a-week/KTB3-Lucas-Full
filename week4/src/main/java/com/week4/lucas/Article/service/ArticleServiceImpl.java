@@ -55,7 +55,7 @@ public class ArticleServiceImpl implements ArticleService {
         if (increaseViews) article.increaseView();
         article.setLikeCount(likesRepo.countByArticleId(articleId));
         article.setCommentCount(commentRepo.countByArticleId(articleId));
-        boolean likedByMe = likesRepo.existsByArticleIdAndUserId(articleId,userId); //내가 좋아요를 눌렀는지
+        boolean likedByMe = userId != null && likesRepo.existsByArticleIdAndUserId(articleId,userId); //내가 좋아요를 눌렀는지
         return ArticleMapper.toArticleDetail(article,likedByMe); //DTO 반환
     }
 
@@ -74,8 +74,11 @@ public class ArticleServiceImpl implements ArticleService {
     
     @Transactional
     @Override
-    public boolean delete(Long articleId) {
-
+    public boolean delete(Long articleId,Long userId) {
+        //본인이 작성한 글이 맞는지 확인
+        Article article = articleRepo.findById(articleId).orElse(null);
+        if (article == null) return false;
+        if (!Objects.equals(article.getUser().getId(), userId)) throw new ForbiddenException();
         return articleRepo.findById(articleId).map(a->{
             a.softDelete();
             return true;

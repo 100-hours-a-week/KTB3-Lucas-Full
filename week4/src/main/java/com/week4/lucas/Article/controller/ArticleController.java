@@ -50,8 +50,8 @@ public class ArticleController {
     @GetMapping("/articles/{article_id}")
     public ResponseEntity<Object> detail(@RequestHeader(value = "Authorization", required = false) String authorization,
                                          @PathVariable("article_id") Long articleId) {
-        Long userId = authTokenResolver.requireUserId(authorization);
-        var article = service.detail(userId,articleId, true);
+        Long userId = authTokenResolver.resolveUserIdIfPresent(authorization);
+        var article = service.detail(userId, articleId, true);
         if (article == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("not_found"));
 
         return ResponseEntity.ok(ApiResponse.ok("post_detail_success",article));
@@ -70,17 +70,24 @@ public class ArticleController {
 
             return ResponseEntity.ok(ApiResponse.ok("Edited_success",editedArticle));
         } catch (ArticleService.ForbiddenException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error("FORBIDDEN"));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error("FORBIDDEN - 게시글 수정 권한 없음"));
         }
     }
 
     // 삭제
     @Operation(summary = "게시글 삭제")
     @DeleteMapping("/articles/{article_id}")
-    public ResponseEntity<Object> delete(@PathVariable("article_id") Long id) {
-        boolean ok = service.delete(id);
-        if (!ok) return ResponseEntity.status(BAD_REQUEST).body(ApiResponse.error("Delete_failed"));
-        return ResponseEntity.ok(ApiResponse.ok("Delete_Success"));
+    public ResponseEntity<Object> delete(@PathVariable("article_id") Long articleId,
+                                         @RequestHeader(value = "Authorization", required = false) String authorization) {
+       try{
+           Long userId = authTokenResolver.requireUserId(authorization);
+           boolean isDelete = service.delete(articleId,userId);
+           if (!isDelete) return ResponseEntity.status(BAD_REQUEST).body(ApiResponse.error("Delete_failed"));
+           return ResponseEntity.ok(ApiResponse.ok("Delete_Success"));
+       } catch (ArticleService.ForbiddenException e){
+           return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ApiResponse.error("FORBIDDEN - 게시글 삭제 권한 없음"));
+       }
+
     }
 
 
