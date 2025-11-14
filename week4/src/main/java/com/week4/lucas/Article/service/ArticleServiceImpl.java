@@ -75,15 +75,13 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional
     @Override
     public boolean delete(Long articleId,Long userId) {
-        //본인이 작성한 글이 맞는지 확인
-        Article article = articleRepo.findById(articleId).orElse(null);
-        if (article == null) return false;
-        if (!Objects.equals(article.getUser().getId(), userId)) throw new ForbiddenException();
-        return articleRepo.findById(articleId).map(a->{
-            a.softDelete();
-            return true;
-        }).orElse(false);
+        Article aRef = em.getReference(Article.class, articleId);
+        if (aRef == null) return false;
+        if (!Objects.equals(aRef.getUser().getId(), userId)) throw new ForbiddenException();
+        aRef.softDelete();
+        return true;
     }
+
     @Transactional
     @Override
     public boolean like(Long articleId,Long userId) {
@@ -94,6 +92,7 @@ public class ArticleServiceImpl implements ArticleService {
         Article aRef = em.getReference(Article.class, articleId);
         User uRef    = em.getReference(User.class, userId);
         likesRepo.save(Likes.builder().article(aRef).user(uRef).build());
+        aRef.setLikeCount(likesRepo.countByArticleId(articleId));
         return true;
     }
     @Transactional
@@ -102,8 +101,11 @@ public class ArticleServiceImpl implements ArticleService {
         if (!likesRepo.existsByArticleIdAndUserId(articleId, userId)) {
             return false;
         }
+
         // 있으면 삭제 후 true
         likesRepo.deleteByArticleIdAndUserId(articleId, userId);
+        Article aRef = em.getReference(Article.class, articleId);
+        aRef.setLikeCount(likesRepo.countByArticleId(articleId));
         return true;
     }
 }

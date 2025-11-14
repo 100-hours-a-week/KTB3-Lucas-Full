@@ -1,4 +1,4 @@
-package com.week4.lucas.Article.dto.response;
+package com.week4.lucas.base.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

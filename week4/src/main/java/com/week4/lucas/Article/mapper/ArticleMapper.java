@@ -3,7 +3,7 @@ package com.week4.lucas.Article.mapper;
 import com.week4.lucas.Article.dto.request.ArticleReq;
 import com.week4.lucas.Article.dto.response.ArticleDetailRes;
 import com.week4.lucas.Article.dto.response.ArticleSummaryRes;
-import com.week4.lucas.Article.dto.response.AuthorRes;
+import com.week4.lucas.base.dto.response.AuthorRes;
 import com.week4.lucas.Article.entity.Article;
 import com.week4.lucas.User.entity.User;
 
@@ -27,6 +27,7 @@ public class ArticleMapper {
                 a.getTitle(),
                 a.getLikeCount(),
                 a.getViewCount(),
+                a.getCommentCount(),
                 a.getArticleCreatedAt(),
                 a.getArticleEditedAt(),
                 new AuthorRes(authorName, authorImg)

@@ -1,8 +1,11 @@
 package com.week4.lucas.User.service;
 
+import com.week4.lucas.User.dto.response.AccountUpdateRes;
 import com.week4.lucas.User.entity.User;
+import com.week4.lucas.User.mapper.UserMapper;
 import com.week4.lucas.User.repository.UserRepository;
 import com.week4.lucas.User.dto.request.UserReq;
+import com.week4.lucas.User.dto.request.AccountUpdateReq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +28,7 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException(e);
         }
     }
+
     //인메모리 토큰 저장
     private final Map<String, Long> activeTokens = new ConcurrentHashMap<>();
     private final UserRepository repo;
@@ -50,7 +54,7 @@ public class UserServiceImpl implements UserService {
         );
         return saved.getId();
     }
-
+// 유저 정보 가져오기 단순 테스트용
     @Transactional(readOnly = true)
     @Override
     public User get(Long id) {
@@ -90,5 +94,33 @@ public class UserServiceImpl implements UserService {
             throw new UnauthorizedException();
         }
         return userId;
+    }
+
+    @Transactional
+    @Override
+    public boolean deleteAccount(Long userId) {
+        User user = repo.findById(userId).orElse(null);
+        if(user==null)return false;
+        user.softDelete();
+        return true;
+    }
+
+    @Transactional
+    @Override
+    public AccountUpdateRes updateAccount(Long userId, AccountUpdateReq req) {
+        User user = repo.findById(userId).orElse(null);
+        if (user == null) {
+            return null;
+        }
+        if (req.name() != null && !req.name().isBlank()) {
+            user.setName(req.name());
+        }
+        if (req.profileImage() != null) {
+            user.setProfileImage(req.profileImage());
+        }
+        if (req.email()!=null && !req.email().isBlank()){
+            user.setEmail(req.email());
+        }
+        return UserMapper.toUpdateUser(user);
     }
 }

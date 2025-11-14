@@ -3,17 +3,19 @@ package com.week4.lucas.User.controller;
 import com.week4.lucas.User.dto.response.ApiResponse;
 import com.week4.lucas.User.dto.request.LoginRequest;
 import com.week4.lucas.User.dto.request.UserReq;
+import com.week4.lucas.User.dto.request.AccountUpdateReq;
 import com.week4.lucas.User.dto.response.LoginSuccess;
 import com.week4.lucas.User.dto.response.LoginUser;
 import com.week4.lucas.User.dto.response.SignupResult;
+import com.week4.lucas.User.dto.response.AccountUpdateRes;
 import com.week4.lucas.User.entity.User;
 import com.week4.lucas.User.service.UserService;
+import com.week4.lucas.User.support.AuthTokenResolver;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.message.SimpleMessage;
 import org.springframework.http.*;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,7 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService service;
+    private final AuthTokenResolver authTokenResolver;
 
     // 회원가입
     @Operation(summary = "회원가입")
@@ -64,37 +67,40 @@ public class UserController {
     @Operation(summary = "로그아웃")
     @SecurityRequirement(name = "BearerAuth")
     @PostMapping("/logout")
-    public ResponseEntity<Object> logout(@RequestHeader(value = "Authorization", required = false) String authorization) {
-        try {
+    public ResponseEntity<?> logout(@RequestHeader(value = "Authorization", required = false) String authorization) {
 
-            if (!StringUtils.hasText(authorization) || !authorization.startsWith("Bearer ")) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new SimpleMessage("Bad Request"));
-            }
             String token = authorization.substring("Bearer ".length()).trim();
-            if (!StringUtils.hasText(token)) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new SimpleMessage("Bad Request"));
-            }
 
             // 토큰 검증/삭제 (없으면 401)
             service.logout(token);
 
             // 성공 200
-            return ResponseEntity.ok(new SimpleMessage("Logout_success"));
+            return ResponseEntity.ok(ApiResponse.ok("Logout_success",null));
 
-        } catch (UserService.UnauthorizedException e) {
-            // 인증 실패 401
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new SimpleMessage("Unauthorized"));
-        } catch (Exception e) {
-            // 기타 오류 500
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new SimpleMessage("Internal Server Error"));
-        }
+    }
+    //회원탈퇴
+    @Operation(summary = "회원탈퇴")
+    @SecurityRequirement(name = "BearerAuth")
+    @DeleteMapping("/account")
+    public ResponseEntity<?> deleteAccount(@RequestHeader(value = "Authorization", required = false) String authorization){
+        Long userId = authTokenResolver.requireUserId(authorization);
+        boolean isDeleted = service.deleteAccount(userId);
+        if(!isDeleted)return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error("delete_failed"));
+        return ResponseEntity.ok(ApiResponse.ok("delete_success",null));
     }
 
-
-
-
+    // 회원 정보 변경
+    @Operation(summary = "회원 정보 변경")
+    @SecurityRequirement(name = "BearerAuth")
+    @PatchMapping("/account")
+    public ResponseEntity<?> updateAccount(@RequestHeader(value = "Authorization", required = false) String authorization,
+                                                           @Valid @RequestBody AccountUpdateReq req) {
+        Long userId = authTokenResolver.requireUserId(authorization);
+        AccountUpdateRes updated = service.updateAccount(userId, req);
+        if (updated == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("account_update_failed"));
+        }
+        return ResponseEntity.ok(ApiResponse.ok("account_update_success", updated));
+    }
 }

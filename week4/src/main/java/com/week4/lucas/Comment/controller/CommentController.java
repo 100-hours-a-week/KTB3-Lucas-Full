@@ -1,6 +1,7 @@
 package com.week4.lucas.Comment.controller;
 
 import com.week4.lucas.Article.dto.response.ApiResponse;
+import com.week4.lucas.Comment.mapper.CommentMapper;
 import com.week4.lucas.Comment.service.CommentService;
 import com.week4.lucas.Comment.dto.request.CommentReq;
 import com.week4.lucas.User.support.AuthTokenResolver;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+
 @Tag(name = "Comment", description = "Comment API")
 @RestController
 @RequestMapping
@@ -19,6 +22,17 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
     private final CommentService service;
     private final AuthTokenResolver authTokenResolver;
+
+    // 댓글 목록
+    @Operation(summary = "특정 게시물의 특정 페이지 댓글 목록")
+    @GetMapping("/articles/{article_id}/comments")
+    public ResponseEntity<Object> getCommentsList(@RequestParam(defaultValue = "1")int page,
+                                                  @PathVariable("article_id") Long articleId){
+        if (page < 1)  return ResponseEntity.status(BAD_REQUEST).body(ApiResponse.error("invalid_request"));
+        int size = 10;
+        var comments = service.getCommentList(articleId,page,size).stream().map(CommentMapper::toRes).toList();;
+        return ResponseEntity.ok(ApiResponse.ok("get_comment_list_success",comments));
+    }
 
     // 댓글 작성
     @Operation(summary = "댓글 작성")

@@ -46,5 +46,18 @@ public class User {
     @Column(name = "user_edited_at")
     private LocalDateTime UserEditedAt;
 
+    public void softDelete(){this.isDelete = true;}
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public void setEmail(String email){
+        this.email  = email;
+    }
 
 }

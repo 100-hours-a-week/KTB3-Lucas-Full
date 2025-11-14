@@ -1,6 +1,6 @@
 package com.week4.lucas.Article.dto.response;
 
-import com.week4.lucas.User.entity.User;
+import com.week4.lucas.base.dto.response.AuthorRes;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;

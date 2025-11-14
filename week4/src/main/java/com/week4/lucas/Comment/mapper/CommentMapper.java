@@ -1,7 +1,7 @@
 package com.week4.lucas.Comment.mapper;
 
 import com.week4.lucas.Article.entity.Article;
-import com.week4.lucas.Article.dto.response.AuthorRes;
+import com.week4.lucas.base.dto.response.AuthorRes;
 import com.week4.lucas.Comment.dto.request.CommentReq;
 import com.week4.lucas.Comment.dto.response.CommentRes;
 import com.week4.lucas.Comment.entity.Comment;

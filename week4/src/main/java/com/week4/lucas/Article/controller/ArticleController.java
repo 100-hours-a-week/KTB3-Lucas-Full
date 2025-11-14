@@ -26,16 +26,16 @@ public class ArticleController {
 
 
     // 목록
-    @Operation(summary = "특정 페이시 게시글 목록 불러오기")
+    @Operation(summary = "특정 페이지 게시글 목록 불러오기")
     @GetMapping("/articles")
-    public ResponseEntity<Object> list(@RequestParam(defaultValue = "1") int page) {
+    public ResponseEntity<Object> getArticleList(@RequestParam(defaultValue = "1") int page) {
         if (page < 1)  return ResponseEntity.status(BAD_REQUEST).body(ApiResponse.error("invalid_request"));
         int size = 10;
         var articles = service.list(page, size).stream().map(ArticleMapper::toSummary).toList();
         return ResponseEntity.ok(ApiResponse.ok("post_list_success",articles));
     }
 
-    // 작성 (201)
+    // 작성
     @Operation(summary = "글 작성")
     @PostMapping("/articles")
     public ResponseEntity<Object> create(@RequestHeader(value = "Authorization", required = false) String authorization,
