@@ -1,0 +1,5 @@
+{
+  "java.jdt.ls.vmargs": "-javaagent:${workspaceFolder}/.vscode/lombok.jar",
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.import.gradle.enabled": true
+}

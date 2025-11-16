@@ -1,6 +1,7 @@
 package com.week4.lucas.User.service;
 
 import com.week4.lucas.User.dto.response.AccountUpdateRes;
+import com.week4.lucas.User.dto.response.LoginUser;
 import com.week4.lucas.User.entity.User;
 import com.week4.lucas.User.mapper.UserMapper;
 import com.week4.lucas.User.repository.UserRepository;
@@ -14,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
@@ -54,25 +56,31 @@ public class UserServiceImpl implements UserService {
         );
         return saved.getId();
     }
-// 유저 정보 가져오기 단순 테스트용
+// 유저 정보 가져오기
     @Transactional(readOnly = true)
     @Override
-    public User get(Long id) {
-        return repo.findById(id).orElseThrow(() ->
+    public LoginUser get(Long id) {
+
+        User user =  repo.findById(id).orElseThrow(() ->
                 new IllegalArgumentException("not found"));
+        return new LoginUser(user.getEmail(), user.getName(), user.getProfileImage());
     }
 
     @Transactional(readOnly = true)
     @Override
-    public User login(String email, String password) {
+    public LoginUser login(String email, String password,String token) {
         User u = repo.findByEmail(email).orElseThrow(UnauthorizedException::new);
+
 
         byte[] inputHash = sha256(password);            // 들어온 비밀번호 해시
         if (!Arrays.equals(u.getPasswordHash(), inputHash)) {
             throw new UnauthorizedException();
         }
-        return u;
+
+        registerToken(token, u.getId());
+        return new LoginUser(u.getEmail(), u.getName(), u.getProfileImage());
     }
+
     @Override
     public void registerToken(String token, Long userId) {
         activeTokens.put(token, userId);
@@ -122,5 +130,27 @@ public class UserServiceImpl implements UserService {
             user.setEmail(req.email());
         }
         return UserMapper.toUpdateUser(user);
+    }
+
+    @Transactional
+    @Override
+    public void changePassword(Long userId, String currentPassword, String newPassword) {
+        User user = repo.findById(userId).orElseThrow(() ->
+                new IllegalArgumentException("user_not_found"));
+
+      // 기존 비번 해싱 이후 맞는 비번인지 체크
+        byte[] currentHashed = sha256(currentPassword);
+
+        if (!Arrays.equals(user.getPasswordHash(), currentHashed)) {
+            throw new IllegalArgumentException("currentPassword_unauthorized");
+        }
+        // 새로운 비밀번호 해싱 이후 비밀번호 중복 체크
+        byte[] newHashed = sha256(newPassword);
+
+        if (Arrays.equals(newHashed, currentHashed)) {
+            throw new IllegalArgumentException("password_duplicated"); // "이전 비밀번호와 동일"
+        }
+
+        user.setPassword(newHashed);
     }
 }

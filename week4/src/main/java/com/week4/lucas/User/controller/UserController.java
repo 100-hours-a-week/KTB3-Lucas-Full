@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -41,12 +40,14 @@ public class UserController {
                 .body(ApiResponse.ok("register_success", new SignupResult(id)));
     }
 
-    // 단순 조회 테스트용
-    @Operation(summary = "회원 테스트 조회(가입 잘 됐는지 확인용)")
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<User>> get(@PathVariable Long id) {
-        User u = service.get(id);
-        return ResponseEntity.ok(ApiResponse.ok("ok", u));
+    // 회원 조회
+    @Operation(summary = "회원 정보 조회")
+    @GetMapping("/")
+    public ResponseEntity<ApiResponse<LoginUser>> get(@RequestHeader(value = "Authorization", required = false)String authorization)
+    {
+        Long userId = authTokenResolver.requireUserId(authorization);
+        LoginUser user = service.get(userId);
+        return ResponseEntity.ok(ApiResponse.ok("ok", user));
     }
 
     // 로그인
@@ -54,12 +55,8 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<LoginSuccess> login(@Valid @RequestBody LoginRequest req) {
         // 실패시 UnauthorizedException
-        User u = service.login(req.email(), req.password());
-
         String token = UUID.randomUUID().toString().replace("-", ""); // 토큰생성
-        service.registerToken(token, u.getId());
-
-        LoginUser user = new LoginUser(u.getId(), u.getName()); // nickname 대신 name 사용
+        LoginUser user = service.login(req.email(), req.password(),token);
         return ResponseEntity.ok(new LoginSuccess("login_success", token, user));
     }
 
@@ -67,7 +64,7 @@ public class UserController {
     @Operation(summary = "로그아웃")
     @SecurityRequirement(name = "BearerAuth")
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader(value = "Authorization", required = false) String authorization) {
+    public ResponseEntity<ApiResponse<Void>> logout(@RequestHeader(value = "Authorization", required = false) String authorization) {
 
             String token = authorization.substring("Bearer ".length()).trim();
 
@@ -82,7 +79,7 @@ public class UserController {
     @Operation(summary = "회원탈퇴")
     @SecurityRequirement(name = "BearerAuth")
     @DeleteMapping("/account")
-    public ResponseEntity<?> deleteAccount(@RequestHeader(value = "Authorization", required = false) String authorization){
+    public ResponseEntity<ApiResponse<Void>> deleteAccount(@RequestHeader(value = "Authorization", required = false) String authorization){
         Long userId = authTokenResolver.requireUserId(authorization);
         boolean isDeleted = service.deleteAccount(userId);
         if(!isDeleted)return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error("delete_failed"));
@@ -93,7 +90,7 @@ public class UserController {
     @Operation(summary = "회원 정보 변경")
     @SecurityRequirement(name = "BearerAuth")
     @PatchMapping("/account")
-    public ResponseEntity<?> updateAccount(@RequestHeader(value = "Authorization", required = false) String authorization,
+    public ResponseEntity<ApiResponse<AccountUpdateRes>> updateAccount(@RequestHeader(value = "Authorization", required = false) String authorization,
                                                            @Valid @RequestBody AccountUpdateReq req) {
         Long userId = authTokenResolver.requireUserId(authorization);
         AccountUpdateRes updated = service.updateAccount(userId, req);
@@ -102,5 +99,20 @@ public class UserController {
                     .body(ApiResponse.error("account_update_failed"));
         }
         return ResponseEntity.ok(ApiResponse.ok("account_update_success", updated));
+    }
+
+    // 비밀번호 변경
+    @Operation(summary = "비밀번호 변경")
+    @SecurityRequirement(name = "BearerAuth")
+    @PatchMapping("/account/password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(@RequestHeader(value = "Authorization", required = false) String authorization,
+                                                            String currentPassword,String newPassword){
+        Long userId = authTokenResolver.requireUserId(authorization);
+        try {
+            service.changePassword(userId,currentPassword,newPassword);
+            return ResponseEntity.ok(ApiResponse.ok("password_change_success", null));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(e.getMessage()));
+        }
     }
 }

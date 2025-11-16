@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>아무 말 대잔치</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-background">
+      <div class="app-surface">
+        <header class="app-header">
+          <a class="brand-link" href="?view=login" data-link data-route="login">아무 말 대잔치</a>
+          <div class="header-controls">
+            <span class="header-caption">자유 게시판</span>
+            <div class="profile-menu" data-role="profile-menu">
+              <button
+                type="button"
+                class="header-avatar"
+                id="headerAvatar"
+                aria-haspopup="true"
+                aria-expanded="false"
+                aria-label="프로필 메뉴 열기"
+              ></button>
+              <div class="profile-menu__panel" data-role="profile-panel">
+                <a href="?view=profile" data-link data-route="profile">회원정보수정</a>
+                <a href="?view=password" data-link data-route="password">비밀번호 수정</a>
+                <button type="button" data-role="logout-btn">로그아웃</button>
+              </div>
+            </div>
+          </div>
+        </header>
+        <main id="app-view" class="app-main" aria-live="polite">
+          <div class="empty-state">화면을 불러오는 중입니다...</div>
+        </main>
+      </div>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

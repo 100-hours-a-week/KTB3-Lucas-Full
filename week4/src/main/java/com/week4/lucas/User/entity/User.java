@@ -60,4 +60,8 @@ public class User {
         this.email  = email;
     }
 
+    public void setPassword(byte[] password){
+        this.passwordHash = password;
+    }
+
 }

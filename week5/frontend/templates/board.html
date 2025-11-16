@@ -1,0 +1,32 @@
+<section class="view">
+  <div class="board-wrapper">
+    <div class="board-hero">
+      <div>
+        <p class="greeting" data-role="board-greeting">안녕하세요, 아무 말 대잔치 게시판 입니다.</p>
+        <p class="sub">지금 올라온 이야기를 확인해 보세요.</p>
+      </div>
+      <button class="primary-button" type="button" data-link data-route="compose">게시글 작성</button>
+    </div>
+    <div class="board-list" id="boardList" aria-live="polite"></div>
+  </div>
+  <template id="board-card-template">
+    <article class="board-card">
+      <div class="board-card__row">
+        <h3 class="board-card__title"></h3>
+        <time class="board-card__date"></time>
+      </div>
+      <div class="board-card__meta">
+        <span>좋아요 <strong data-field="likes">0</strong></span>
+        <span>댓글 <strong data-field="comments">0</strong></span>
+        <span>조회수 <strong data-field="views">0</strong></span>
+      </div>
+      <div class="board-card__author">
+        <div class="avatar" data-field="avatar"></div>
+        <div>
+          <p class="author-name" data-field="author">익명</p>
+          <p class="author-desc" data-field="author-desc">더미 작성자</p>
+        </div>
+      </div>
+    </article>
+  </template>
+</section>
