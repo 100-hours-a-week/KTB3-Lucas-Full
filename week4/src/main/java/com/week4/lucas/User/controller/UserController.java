@@ -56,7 +56,9 @@ public class UserController {
     public ResponseEntity<LoginSuccess> login(@Valid @RequestBody LoginRequest req) {
         // 실패시 UnauthorizedException
         String token = UUID.randomUUID().toString().replace("-", ""); // 토큰생성
+
         LoginUser user = service.login(req.email(), req.password(),token);
+
         return ResponseEntity.ok(new LoginSuccess("login_success", token, user));
     }
 
@@ -108,11 +110,9 @@ public class UserController {
     public ResponseEntity<ApiResponse<Void>> changePassword(@RequestHeader(value = "Authorization", required = false) String authorization,
                                                             String currentPassword,String newPassword){
         Long userId = authTokenResolver.requireUserId(authorization);
-        try {
-            service.changePassword(userId,currentPassword,newPassword);
-            return ResponseEntity.ok(ApiResponse.ok("password_change_success", null));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(e.getMessage()));
-        }
+
+        service.changePassword(userId,currentPassword,newPassword);
+        return ResponseEntity.ok(ApiResponse.ok("password_change_success", null));
+
     }
 }

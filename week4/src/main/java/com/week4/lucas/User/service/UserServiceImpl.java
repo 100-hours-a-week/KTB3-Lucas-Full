@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService {
 
         byte[] inputHash = sha256(password);            // 들어온 비밀번호 해시
         if (!Arrays.equals(u.getPasswordHash(), inputHash)) {
-            throw new UnauthorizedException();
+            throw new InvalidCredentialsException();
         }
 
         registerToken(token, u.getId());

@@ -25,12 +25,12 @@ export async function request(path, options = {}) {
     const isJson = response.headers.get('content-type')?.includes('application/json');
     const payload = isJson ? await response.json() : await response.text();
     if (!response.ok) {
-      if (response.status === 401) {
-        document.dispatchEvent(new CustomEvent('app:unauthorized'));
-      }
       const message = typeof payload === 'object' && payload?.message
         ? payload.message
         : '요청에 실패했습니다.';
+      if (response.status === 401 && message !== 'invalid_credentials') {
+        document.dispatchEvent(new CustomEvent('app:unauthorized'));
+      }
       const error = new Error(message);
       error.status = response.status;
       error.data = payload;

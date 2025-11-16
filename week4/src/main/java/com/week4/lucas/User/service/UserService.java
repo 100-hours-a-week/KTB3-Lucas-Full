@@ -34,4 +34,12 @@ public interface UserService {
 
         }
     }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    class InvalidCredentialsException extends RuntimeException {
+        public InvalidCredentialsException() {
+            super("invalid_credentials"); // 아이디/비번 불일치
+        }
+    }
+
 }
