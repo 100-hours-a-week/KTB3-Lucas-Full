@@ -1,12 +1,21 @@
 import { fetchArticleDetail, updateArticle } from '../api/articles.js';
 import { setHelperText, setLoading } from '../utils/dom.js';
 import { navigate } from '../core/router.js';
+import { mountRichEditor } from '../utils/editor.js';
 
 export async function initPostEditView(container) {
   const form = container.querySelector('#postEditForm');
   const helper = container.querySelector('[data-role="post-helper"]');
+  const editorHost = container.querySelector('#postEditEditor');
+  const hiddenTextarea = container.querySelector('#postEditContent');
   if (!form) return;
   if (helper) setHelperText(helper, '* helper text');
+  const editor = mountRichEditor(editorHost, {
+    placeholder: '수정할 내용을 입력해주세요.'
+  });
+  if (!editor && hiddenTextarea) {
+    hiddenTextarea.hidden = false;
+  }
 
   const articleId = getArticleIdFromQuery();
   if (!articleId) {
@@ -20,7 +29,7 @@ export async function initPostEditView(container) {
   try {
     const response = await fetchArticleDetail(articleId);
     const { data } = response;
-    populateForm(form, data);
+    populateForm(form, data, editor, hiddenTextarea);
   } catch (error) {
     setHelperText(helper, error.message || '게시글 정보를 불러오지 못했습니다.');
     form.querySelectorAll('input, textarea, button[type="submit"]').forEach((el) => {
@@ -29,20 +38,26 @@ export async function initPostEditView(container) {
     return;
   }
 
-  form.addEventListener('submit', (event) => handleSubmit(event, form, helper, articleId));
+  form.addEventListener('submit', (event) =>
+    handleSubmit({ event, form, helper, articleId, editor, hiddenTextarea })
+  );
 }
 
-function populateForm(form, article) {
+function populateForm(form, article, editor, textarea) {
   form.querySelector('#postEditTitle').value = article?.title ?? '';
-  form.querySelector('#postEditContent').value = article?.content ?? '';
+  if (editor) {
+    editor.setMarkdown(article?.content ?? '');
+  } else if (textarea) {
+    textarea.value = article?.content ?? '';
+  }
 }
 
-async function handleSubmit(event, form, helper, articleId) {
+async function handleSubmit({ event, form, helper, articleId, editor, hiddenTextarea }) {
   event.preventDefault();
   const titleInput = form.querySelector('#postEditTitle');
-  const contentInput = form.querySelector('#postEditContent');
   const title = titleInput.value.trim();
-  const content = contentInput.value.trim();
+  const contentSource = editor ? editor.getMarkdown() : hiddenTextarea?.value;
+  const content = (contentSource || '').trim();
 
   if (!title) {
     setHelperText(helper, '제목을 입력해주세요.');
@@ -51,7 +66,7 @@ async function handleSubmit(event, form, helper, articleId) {
   }
   if (!content) {
     setHelperText(helper, '내용을 입력해주세요.');
-    contentInput.focus();
+    editor?.focus();
     return;
   }
 

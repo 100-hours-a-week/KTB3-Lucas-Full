@@ -10,6 +10,7 @@ import {
 } from '../api/articles.js';
 import { setHelperText, setLoading } from '../utils/dom.js';
 import { navigate } from '../core/router.js';
+import { renderMarkdown } from '../utils/editor.js';
 
 const CATEGORY_META = {
   tech: 'Tech Talk',
@@ -138,7 +139,6 @@ export async function initPostDetailView(container) {
 
 function populateDetail(container, article) {
   container.querySelector('[data-field="title"]').textContent = article.title || '';
-  container.querySelector('[data-field="content"]').textContent = article.content || '';
   container.querySelector('[data-field="author"]').textContent = article.author?.userName || '';
   container.querySelector('[data-field="createdAt"]').textContent = article.createdAt || '';
   container.querySelector('[data-field="likeCount"]').textContent = article.likeCount ?? 0;
@@ -146,6 +146,10 @@ function populateDetail(container, article) {
   container.querySelector('[data-field="commentCount"]').textContent = article.commentCount ?? 0;
   populateCategory(container, article);
   populateAIVerdict(container, article);
+  const viewer = container.querySelector('[data-role="post-viewer"]');
+  if (viewer) {
+    renderMarkdown(viewer, article.content || '');
+  }
   const actions = container.querySelector('.post-detail__actions');
   if (actions) {
     actions.classList.toggle('is-hidden', article.isAuthor === false);

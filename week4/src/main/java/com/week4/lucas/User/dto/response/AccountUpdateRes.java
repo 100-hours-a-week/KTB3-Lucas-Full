@@ -6,5 +6,5 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record AccountUpdateRes(
         String name,
         String email,
-        String profileImage
+        String profileImage //링크
 ) {}

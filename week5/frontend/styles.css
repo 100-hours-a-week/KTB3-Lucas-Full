@@ -429,6 +429,28 @@ body {
   font-size: 16px;
 }
 
+.post-detail__content .toastui-editor-contents {
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.post-detail__content .toastui-editor-contents pre {
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  overflow: auto;
+}
+
+[data-theme='dark'] .post-detail__content {
+  background: rgba(12, 18, 34, 0.6);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .post-detail__content .toastui-editor-contents pre {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .post-detail__stats {
   display: flex;
   flex-wrap: wrap;
@@ -795,6 +817,50 @@ body {
   border: 2px solid var(--border);
   font-size: 16px;
   font-family: inherit;
+}
+
+.form-field--editor {
+  gap: 12px;
+}
+
+.rich-editor {
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rich-editor:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(114, 137, 218, 0.18);
+}
+
+.rich-editor .toastui-editor-defaultUI {
+  border: none;
+}
+
+.rich-editor .toastui-editor-toolbar {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(248, 250, 255, 0.9);
+}
+
+.rich-editor .toastui-editor-main {
+  background: #fff;
+}
+
+[data-theme='dark'] .rich-editor {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme='dark'] .rich-editor .toastui-editor-toolbar {
+  background: rgba(15, 18, 32, 0.95);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme='dark'] .rich-editor .toastui-editor-main {
+  background: rgba(12, 18, 34, 0.9);
 }
 
 .form-field input:focus {
