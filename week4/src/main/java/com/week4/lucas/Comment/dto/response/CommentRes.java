@@ -12,5 +12,6 @@ public record CommentRes(
         String content,
         LocalDateTime createdAt,
         LocalDateTime editedAt,
-        AuthorRes author
+        AuthorRes author,
+        boolean isAuthor //현재 유저가 작성한 댓글인지
 ) {}

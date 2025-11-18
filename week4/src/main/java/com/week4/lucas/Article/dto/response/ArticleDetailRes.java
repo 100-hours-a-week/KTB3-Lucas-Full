@@ -16,5 +16,6 @@ public record ArticleDetailRes(
         LocalDateTime createdAt,
         LocalDateTime editedAt,
         AuthorRes author,
-        boolean likedByMe
+        boolean likedByMe,
+        boolean isAuthor //현재 유저가 작성한 글인지
 ) {}

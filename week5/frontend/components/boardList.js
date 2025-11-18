@@ -15,16 +15,25 @@ export function renderBoardList(posts, target, template) {
     const card = node.querySelector('.board-card');
     if (card) {
       card.dataset.articleId = post.postId;
+      card.dataset.category = post.categoryKey ?? 'tech';
     }
     node.querySelector('.board-card__title').textContent = post.title ?? '제목 없음';
     node.querySelector('.board-card__date').textContent = formatDate(post.createdAt ?? post.editedAt);
+    const categoryNode = node.querySelector('[data-field="category"]');
+    if (categoryNode) categoryNode.textContent = post.categoryLabel ?? 'Community';
+    const aiNode = node.querySelector('[data-field="ai-status"]');
+    if (aiNode) {
+      const statusText = post.aiStatus ?? 'AI REVIEWING';
+      aiNode.textContent = statusText;
+      aiNode.classList.toggle('is-reviewing', statusText.includes('REVIEWING'));
+    }
     node.querySelector('[data-field="likes"]').textContent = post.likeCount ?? 0;
     node.querySelector('[data-field="views"]').textContent = post.viewCount ?? 0;
     node.querySelector('[data-field="comments"]').textContent = post.commentCount ?? 0;
 
     const authorName = post.author?.userName ?? '익명 작성자';
     node.querySelector('[data-field="author"]').textContent = authorName;
-    node.querySelector('[data-field="author-desc"]').textContent = '게시글 작성자';
+    node.querySelector('[data-field="author-desc"]').textContent = 'TrueDev Member';
     const avatar = node.querySelector('[data-field="avatar"]');
     if (post.author?.profileImage) {
       avatar.style.backgroundImage = `url(${post.author.profileImage})`;

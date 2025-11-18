@@ -7,6 +7,8 @@ import { initPostDetailView } from '../views/postDetailView.js';
 import { initProfileEditView } from '../views/profileEditView.js';
 import { initPasswordChangeView } from '../views/passwordChangeView.js';
 import { initPostEditView } from '../views/postEditView.js';
+import { initHomeView } from '../views/homeView.js';
+import { initMyPageView } from '../views/myPageView.js';
 
 const ROUTE_PARAM = 'view';
 const templateCache = new Map();
@@ -22,6 +24,11 @@ const routes = {
     template: './templates/signup.html',
     controller: initSignupView,
     redirectIfAuth: true
+  },
+  home: {
+    template: './templates/home.html',
+    controller: initHomeView,
+    requiresAuth: true
   },
   board: {
     template: './templates/board.html',
@@ -52,6 +59,11 @@ const routes = {
     template: './templates/password-change.html',
     controller: initPasswordChangeView,
     requiresAuth: true
+  },
+  mypage: {
+    template: './templates/mypage.html',
+    controller: initMyPageView,
+    requiresAuth: true
   }
 };
 
@@ -69,7 +81,14 @@ export function setupRouter() {
     const routeKey = link.dataset.route;
     if (!routeKey) return;
     event.preventDefault();
-    navigate(routeKey);
+    const params = {};
+    if (link.dataset.category) {
+      params.category = link.dataset.category;
+    }
+    if (link.dataset.section) {
+      params.section = link.dataset.section;
+    }
+    navigate(routeKey, { params: Object.keys(params).length ? params : undefined });
   });
 
   const initialRoute = getRouteFromLocation();
@@ -77,21 +96,21 @@ export function setupRouter() {
 }
 
 export function navigate(routeKey, options = {}) {
-  return renderRoute(routeKey, { replace: options.replace ?? false });
+  return renderRoute(routeKey, { replace: options.replace ?? false, params: options.params });
 }
 
-async function renderRoute(routeKey, { replace = false, skipHistory = false } = {}) {
+async function renderRoute(routeKey, { replace = false, skipHistory = false, params } = {}) {
   let targetKey = normalizeRoute(routeKey);
   const targetConfig = routes[targetKey];
 
   if (targetConfig.requiresAuth && !hasAuth()) {
     targetKey = defaultRoute;
   } else if (targetConfig.redirectIfAuth && hasAuth()) {
-    targetKey = 'board';
+    targetKey = 'home';
   }
 
   if (!skipHistory || replace) {
-    updateHistory(targetKey, replace || skipHistory);
+    updateHistory(targetKey, replace || skipHistory, params);
   }
 
   const route = routes[targetKey];
@@ -117,9 +136,15 @@ function getRouteFromLocation() {
   return normalizeRoute(key);
 }
 
-function updateHistory(routeKey, replace) {
+function updateHistory(routeKey, replace, params) {
   const url = new URL(window.location.href);
   url.searchParams.set(ROUTE_PARAM, routeKey);
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === null) return;
+      url.searchParams.set(key, value);
+    });
+  }
   const relative = url.pathname + url.search + url.hash;
   if (replace) {
     history.replaceState({}, '', relative);

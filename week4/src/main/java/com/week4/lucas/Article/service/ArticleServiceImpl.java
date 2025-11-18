@@ -56,7 +56,8 @@ public class ArticleServiceImpl implements ArticleService {
         article.setLikeCount(likesRepo.countByArticleId(articleId));
         article.setCommentCount(commentRepo.countByArticleId(articleId));
         boolean likedByMe = userId != null && likesRepo.existsByArticleIdAndUserId(articleId,userId); //내가 좋아요를 눌렀는지
-        return ArticleMapper.toArticleDetail(article,likedByMe); //DTO 반환
+        boolean isAuthor = userId != null && articleRepo.existsByIdAndUserId(articleId,userId); //내가 게시글을 작성했는지
+        return ArticleMapper.toArticleDetail(article,likedByMe,isAuthor); //DTO 반환
     }
 
     @Transactional
@@ -69,7 +70,8 @@ public class ArticleServiceImpl implements ArticleService {
         if (req.title() != null) article.setTitle(req.title());
         if (req.content() != null) article.setContent(req.content());
         boolean likedByMe = likesRepo.existsByArticleIdAndUserId(articleId,userId); //내가 좋아요를 눌렀는지
-        return ArticleMapper.toArticleDetail(article,likedByMe) ;
+        boolean isAuthor = userId != null && articleRepo.existsByIdAndUserId(articleId,userId); //내가 게시글을 작성했는지
+        return ArticleMapper.toArticleDetail(article,likedByMe,isAuthor) ;
     }
     
     @Transactional

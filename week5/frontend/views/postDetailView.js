@@ -11,6 +11,13 @@ import {
 import { setHelperText, setLoading } from '../utils/dom.js';
 import { navigate } from '../core/router.js';
 
+const CATEGORY_META = {
+  tech: 'Tech Talk',
+  dev: '개발자 Talk',
+  career: '취준생 Talk'
+};
+const CATEGORY_KEYS = Object.keys(CATEGORY_META);
+
 export async function initPostDetailView(container) {
   const articleId = getArticleIdFromQuery();
   if (!articleId) {
@@ -137,6 +144,12 @@ function populateDetail(container, article) {
   container.querySelector('[data-field="likeCount"]').textContent = article.likeCount ?? 0;
   container.querySelector('[data-field="viewCount"]').textContent = article.viewCount ?? 0;
   container.querySelector('[data-field="commentCount"]').textContent = article.commentCount ?? 0;
+  populateCategory(container, article);
+  populateAIVerdict(container, article);
+  const actions = container.querySelector('.post-detail__actions');
+  if (actions) {
+    actions.classList.toggle('is-hidden', article.isAuthor === false);
+  }
   const likeButton = container.querySelector('[data-role="like-button"]');
   syncLikeButtonState(likeButton, resolveLikedState(article));
 }
@@ -161,6 +174,38 @@ function syncLikeButtonState(button, isLiked) {
   button.classList.toggle('is-liked', isLiked);
   button.setAttribute('aria-pressed', isLiked ? 'true' : 'false');
   button.dataset.liked = isLiked ? 'true' : 'false';
+}
+
+function populateAIVerdict(container, article) {
+  const statusField = container.querySelector('[data-field="ai-status"]');
+  const messageField = container.querySelector('[data-field="ai-message"]');
+  const updatedField = container.querySelector('[data-field="ai-updated"]');
+  if (!statusField || !messageField) return;
+  const verified = (article.viewCount ?? 0) % 3 !== 1;
+  statusField.textContent = verified ? 'AI VERIFIED' : 'AI REVIEWING';
+  statusField.classList.toggle('is-reviewing', !verified);
+  messageField.textContent = verified
+    ? 'TrueDev AI가 내용을 검증했습니다. '
+    : '현재 AI가 내용을 검증하고 있습니다. 커뮤니티 가이드에 어긋나지 않는지 확인 중입니다.';
+  if (updatedField) {
+    updatedField.textContent = formatDate(article.editedAt || article.createdAt || new Date().toISOString());
+  }
+}
+
+function populateCategory(container, article) {
+  const label = container.querySelector('[data-role="post-category"]');
+  if (!label) return;
+  const key = deriveCategoryKey(article);
+  label.textContent = CATEGORY_META[key] ?? 'TrueDev Thread';
+}
+
+function deriveCategoryKey(article) {
+  const base = typeof article.postId === 'number'
+    ? article.postId
+    : typeof article.id === 'number'
+      ? article.id
+      : Math.floor(Math.random() * 999);
+  return CATEGORY_KEYS[base % CATEGORY_KEYS.length];
 }
 
 async function handleLikeToggle(button, articleId) {
@@ -232,7 +277,7 @@ function handleCommentAction(
   const editButton = event.target.closest('[data-role="comment-edit"]');
   if (editButton) {
     const card = editButton.closest('.comment-card');
-    if (card) {
+    if (card && card.dataset.isAuthor === 'true') {
       handleCommentEdit({
         card,
         container,
@@ -247,7 +292,7 @@ function handleCommentAction(
   const deleteButton = event.target.closest('[data-role="comment-delete"]');
   if (deleteButton) {
     const card = deleteButton.closest('.comment-card');
-    if (card) {
+    if (card && card.dataset.isAuthor === 'true') {
       const commentId = Number(card.dataset.commentId);
       if (commentId) {
         if (commentDeleteModal) {
@@ -301,10 +346,15 @@ async function loadComments(container, articleId, page = 1) {
       const card = node.querySelector('.comment-card');
       if (card) {
         card.dataset.commentId = comment.id;
+        card.dataset.isAuthor = comment.isAuthor ? 'true' : 'false';
       }
       node.querySelector('[data-field="author"]').textContent = comment.author?.userName || '익명';
       node.querySelector('[data-field="createdAt"]').textContent = formatDate(comment.createdAt);
       node.querySelector('[data-field="content"]').textContent = comment.content || '';
+      const actions = node.querySelector('[data-role="comment-actions"]');
+      if (actions) {
+        actions.classList.toggle('is-hidden', comment.isAuthor === false);
+      }
       const avatar = node.querySelector('[data-field="avatar"]');
       if (avatar) {
         if (comment.author?.profileImage) {

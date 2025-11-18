@@ -11,7 +11,7 @@ public interface CommentService {
 
     CommentRes editComment(Long articleId, Long commentId, Long userId, CommentReq.EditCommentReq req);
 
-    List<Comment> getCommentList(Long articleId, int page, int size);
+    List<CommentRes> getCommentList(Long articleId,Long userId, int page, int size);
 
     boolean deleteComment(Long articleId, Long commentId, Long userId);
 }

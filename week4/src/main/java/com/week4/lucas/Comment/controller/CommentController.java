@@ -27,10 +27,12 @@ public class CommentController {
     @Operation(summary = "특정 게시물의 특정 페이지 댓글 목록")
     @GetMapping("/articles/{article_id}/comments")
     public ResponseEntity<Object> getCommentsList(@RequestParam(defaultValue = "1")int page,
+                                                  @RequestHeader(value = "Authorization", required = false) String authorization,
                                                   @PathVariable("article_id") Long articleId){
+        Long userId = authTokenResolver.requireUserId(authorization);
         if (page < 1)  return ResponseEntity.status(BAD_REQUEST).body(ApiResponse.error("invalid_request"));
         int size = 10;
-        var comments = service.getCommentList(articleId,page,size).stream().map(CommentMapper::toRes).toList();;
+        var comments = service.getCommentList(articleId,userId,page,size);
         return ResponseEntity.ok(ApiResponse.ok("get_comment_list_success",comments));
     }
 

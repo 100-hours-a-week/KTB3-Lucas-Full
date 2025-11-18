@@ -17,17 +17,19 @@ public class CommentMapper {
     }
 
 
-    public static CommentRes toRes(Comment c){
+    public static CommentRes toRes(Comment c,Long userId){
         String userName = (c.getUser() != null) ? c.getUser().getName() : null;
         String userImg  = (c.getUser() != null) ? c.getUser().getProfileImage() : null;
-
+        boolean isAuthor = c.getUser() != null
+                && c.getUser().getId().equals(userId);
         return new CommentRes(
                 c.getId(),
                 c.getArticle() != null ? c.getArticle().getId() : null,
                 c.getContent(),
                 c.getCommentCreatedAt(),
                 c.getCommentEditedAt(),
-                new AuthorRes(userName,userImg)
+                new AuthorRes(userName,userImg),
+                isAuthor //현재 유저가 작성한 글인지
         );
     }
 }

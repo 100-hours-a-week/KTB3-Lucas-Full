@@ -23,4 +23,5 @@ public interface ArticleRepository extends JpaRepository<Article,Long> {
             """
     )
     Page<Article> findAllByIsDeletedFalse(Pageable pageable);
+    boolean existsByIdAndUserId(Long ArticleId, Long UserId);
 }

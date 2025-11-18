@@ -40,7 +40,7 @@ export function initLoginView(container) {
       persistAuth(token, normalizedUser);
       refreshHeader();
       setHelperText(helper, '로그인 성공! 게시판으로 이동합니다.', 'success');
-      setTimeout(() => navigate('board', { replace: true }), 600);
+      setTimeout(() => navigate('home', { replace: true }), 600);
     } catch (error) {
       if (error?.message === 'invalid_credentials') {
         setHelperText(helper, '이메일 또는 비밀번호가 올바르지 않습니다.');

@@ -22,7 +22,7 @@ async function handleSubmit(form, helper) {
     return;
   }
   if (!isValidPassword(current) || !isValidPassword(next) || !isValidPassword(confirm)) {
-    setHelperText(helper, '비밀번호는 4~16자 사이여야 합니다.');
+    setHelperText(helper, '비밀번호는 8~72자 사이여야 합니다.');
     return;
   }
   if (next !== confirm) {
@@ -49,5 +49,5 @@ async function handleSubmit(form, helper) {
 }
 
 function isValidPassword(value) {
-  return typeof value === 'string' && value.length >= 4 && value.length <= 16;
+  return typeof value === 'string' && value.length >= 8 && value.length <= 72;
 }

@@ -31,7 +31,7 @@ public class CommentServiceImpl implements CommentService {
         User userRef = em.getReference(User.class, userId);
         Comment c = commentRepo.save(CommentMapper.toEntity(articleRef, userRef, req));
         articleRef.setCommentCount(commentRepo.countByArticleId(articleId));
-        return CommentMapper.toRes(c);
+        return CommentMapper.toRes(c,userId);
     }
     @Transactional
     @Override
@@ -41,14 +41,14 @@ public class CommentServiceImpl implements CommentService {
         if (!c.getUser().getId().equals(userId)) return null;
 
         c.edit(req.content()); // 더티체킹으로 UPDATE
-        return CommentMapper.toRes(c);
+        return CommentMapper.toRes(c,userId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
-    public List<Comment> getCommentList(Long articleId, int page, int size) {
+    public List<CommentRes> getCommentList(Long articleId, Long userId,int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "commentCreatedAt"));
-        return commentRepo.findCommentsByArticleId(articleId,pageable).getContent();
+        return commentRepo.findCommentsByArticleId(articleId,pageable).getContent().stream().map(c->CommentMapper.toRes(c,userId)).toList();
     }
 
     @Transactional
