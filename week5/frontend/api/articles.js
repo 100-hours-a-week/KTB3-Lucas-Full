@@ -1,7 +1,8 @@
 import { request } from './http.js';
 
-export function fetchArticles() {
-  return request('/articles');
+export function fetchArticles(page = 1) {
+  const params = new URLSearchParams({ page: String(page) });
+  return request(`/articles?${params.toString()}`);
 }
 
 export function createArticle(payload) {

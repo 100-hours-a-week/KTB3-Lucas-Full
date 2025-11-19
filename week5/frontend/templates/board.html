@@ -38,6 +38,12 @@
       </div>
     </section>
     <div class="board-list" id="boardList" aria-live="polite"></div>
+    <nav class="board-pagination is-hidden" data-role="pagination" aria-label="게시글 페이지">
+      <button type="button" class="ghost-button board-pagination__control" data-role="page-prev">이전</button>
+      <div class="board-pagination__pages" data-role="pagination-pages"></div>
+      <span class="board-pagination__info" data-role="pagination-info">1 / 1</span>
+      <button type="button" class="ghost-button board-pagination__control" data-role="page-next">다음</button>
+    </nav>
   </div>
   <template id="board-card-template">
     <article class="board-card">

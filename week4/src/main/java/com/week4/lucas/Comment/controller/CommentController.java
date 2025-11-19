@@ -1,8 +1,8 @@
 package com.week4.lucas.Comment.controller;
 
 import com.week4.lucas.Article.dto.response.ApiResponse;
+import com.week4.lucas.Comment.dto.response.CommentPageRes;
 import com.week4.lucas.Comment.dto.response.CommentRes;
-import com.week4.lucas.Comment.mapper.CommentMapper;
 import com.week4.lucas.Comment.service.CommentService;
 import com.week4.lucas.Comment.dto.request.CommentReq;
 import com.week4.lucas.User.support.AuthTokenResolver;
@@ -27,9 +27,9 @@ public class CommentController {
     // 댓글 목록
     @Operation(summary = "특정 게시물의 특정 페이지 댓글 목록")
     @GetMapping("/articles/{article_id}/comments")
-    public ResponseEntity<Object> getCommentsList(@RequestParam(defaultValue = "1")int page,
-                                                  @RequestHeader(value = "Authorization", required = false) String authorization,
-                                                  @PathVariable("article_id") Long articleId){
+    public ResponseEntity<ApiResponse<CommentPageRes>> getCommentsList(@RequestParam(defaultValue = "1")int page,
+                                                                       @RequestHeader(value = "Authorization", required = false) String authorization,
+                                                                       @PathVariable("article_id") Long articleId){
         Long userId = authTokenResolver.requireUserId(authorization);
         if (page < 1)  return ResponseEntity.status(BAD_REQUEST).body(ApiResponse.error("invalid_request"));
         int size = 10;

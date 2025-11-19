@@ -22,7 +22,7 @@ const CATEGORY_KEYS = Object.keys(CATEGORY_META);
 const AI_MESSAGES = {
   [AI_STATUS.VERIFIED]: 'TrueDev AI가 내용을 검증했습니다. 기술적인 오류가 확인되지 않았어요.',
   [AI_STATUS.REVIEWING]: '현재 AI가 내용을 검증하고 있습니다. 커뮤니티 가이드 준수 여부를 확인 중입니다.',
-  [AI_STATUS.FLAGGED]: 'AI가 사실관계나 커뮤니티 가이드 위반 가능성을 감지했습니다. 추가 확인이 필요해요.'
+  [AI_STATUS.WARNING]: 'AI가 사실관계나 커뮤니티 가이드 위반 가능성을 감지했습니다. 추가 확인이 필요해요.'
 };
 
 export async function initPostDetailView(container) {
@@ -194,7 +194,7 @@ function populateAIVerdict(container, article) {
   const status = resolveAIStatus(article);
   statusField.textContent = status;
   statusField.classList.toggle('is-reviewing', status === AI_STATUS.REVIEWING);
-  statusField.classList.toggle('is-flagged', status === AI_STATUS.FLAGGED);
+  statusField.classList.toggle('is-warning', status === AI_STATUS.WARNING);
   messageField.textContent = AI_MESSAGES[status] ?? AI_MESSAGES[AI_STATUS.REVIEWING];
   if (updatedField) {
     updatedField.textContent = formatDate(article.editedAt || article.createdAt || new Date().toISOString());

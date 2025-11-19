@@ -1,6 +1,7 @@
 package com.week4.lucas.Comment.service;
 
 import com.week4.lucas.Article.entity.Article;
+import com.week4.lucas.Comment.dto.response.CommentPageRes;
 import com.week4.lucas.Comment.mapper.CommentMapper;
 import com.week4.lucas.Comment.dto.request.CommentReq;
 import com.week4.lucas.Comment.dto.response.CommentRes;
@@ -9,6 +10,7 @@ import com.week4.lucas.Comment.repository.CommentRepository;
 import com.week4.lucas.User.entity.User;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -46,9 +48,20 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<CommentRes> getCommentList(Long articleId, Long userId,int page, int size) {
+    public CommentPageRes getCommentList(Long articleId, Long userId, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "commentCreatedAt"));
-        return commentRepo.findCommentsByArticleId(articleId,pageable).getContent().stream().map(c->CommentMapper.toRes(c,userId)).toList();
+        Page<Comment> result = commentRepo.findCommentsByArticleId(articleId,pageable);
+        List<CommentRes> comments = result.getContent().stream().map(c->CommentMapper.toRes(c,userId)).toList();
+
+        return new CommentPageRes(
+                comments,
+                page,
+                size,
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.hasNext(),
+                result.hasPrevious()
+        );
     }
 
     @Transactional

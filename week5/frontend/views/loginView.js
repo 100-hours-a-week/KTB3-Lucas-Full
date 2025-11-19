@@ -31,13 +31,14 @@ export function initLoginView(container) {
     const submitButton = form.querySelector('[type="submit"]');
     setLoading(submitButton, true);
     try {
-      const { token, user } = await login({ email, password });
+      const response = await login({ email, password });
+      const payload = response?.data ?? {};
       const normalizedUser = {
-        userName: user?.userName ?? '',
-        email: user?.userEmail ?? '',
-        profileImage: user?.profileImage ?? ''
+        userName: payload.user?.userName ?? '',
+        email: payload.user?.userEmail ?? '',
+        profileImage: payload.user?.profileImage ?? ''
       };
-      persistAuth(token, normalizedUser);
+      persistAuth(payload.token, normalizedUser);
       refreshHeader();
       setHelperText(helper, '로그인 성공! 게시판으로 이동합니다.', 'success');
       setTimeout(() => navigate('home', { replace: true }), 600);

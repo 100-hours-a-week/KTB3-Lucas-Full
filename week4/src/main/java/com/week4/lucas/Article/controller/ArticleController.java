@@ -1,10 +1,12 @@
 package com.week4.lucas.Article.controller;
 
 import com.week4.lucas.Article.dto.response.ArticleDetailRes;
+import com.week4.lucas.Article.dto.response.ArticlePageRes;
 import com.week4.lucas.Article.mapper.ArticleMapper;
 import com.week4.lucas.Article.service.ArticleService;
 import com.week4.lucas.Article.dto.request.ArticleReq;
 import com.week4.lucas.Article.dto.response.ApiResponse;
+import com.week4.lucas.Comment.dto.response.CommentRes;
 import com.week4.lucas.User.support.AuthTokenResolver;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,10 +31,10 @@ public class ArticleController {
     // 특정 페이지 목록
     @Operation(summary = "특정 페이지 게시글 목록 불러오기")
     @GetMapping("/articles")
-    public ResponseEntity<Object> getArticleList(@RequestParam(defaultValue = "1") int page) {
+    public ResponseEntity<ApiResponse<ArticlePageRes>> getArticleList(@RequestParam(defaultValue = "1") int page) {
         if (page < 1)  return ResponseEntity.status(BAD_REQUEST).body(ApiResponse.error("invalid_request"));
         int size = 10;
-        var articles = service.list(page, size).stream().map(ArticleMapper::toSummary).toList();
+        var articles = service.list(page, size);
         return ResponseEntity.ok(ApiResponse.ok("post_list_success",articles));
     }
 

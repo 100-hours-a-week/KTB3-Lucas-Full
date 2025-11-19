@@ -2,6 +2,7 @@ package com.week4.lucas.Article.service;
 
 
 import com.week4.lucas.Article.dto.response.ArticleDetailRes;
+import com.week4.lucas.Article.dto.response.ArticlePageRes;
 import com.week4.lucas.Article.dto.response.ArticleSummaryRes;
 import com.week4.lucas.Article.mapper.ArticleMapper;
 import com.week4.lucas.Article.Likes.entity.Likes;
@@ -14,6 +15,7 @@ import com.week4.lucas.User.entity.User;
 import com.week4.lucas.User.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -35,9 +37,21 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Transactional
     @Override
-    public List<Article> list(int page, int size) {
+    public ArticlePageRes list(int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "articleCreatedAt"));
-        return articleRepo.findAllByIsDeletedFalse(pageable).getContent();
+        Page<Article> result = articleRepo.findAllByIsDeletedFalse(pageable);
+        List<ArticleSummaryRes> articleSummaryRes = result.getContent().stream()
+                .map(ArticleMapper::toSummary)   // Article -> ArticleSummaryRes
+                .toList();
+        return new ArticlePageRes(
+                articleSummaryRes,
+                page,
+                size,
+                result.getTotalPages(),
+                result.getTotalElements(),
+                result.hasNext(),
+                result.hasPrevious()
+        );
     }
 
     @Transactional

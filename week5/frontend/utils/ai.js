@@ -1,7 +1,7 @@
 export const AI_STATUS = {
   VERIFIED: 'AI VERIFIED',
   REVIEWING: 'AI REVIEWING',
-  FLAGGED: 'AI FLAGGED'
+  WARNING: 'AI WARNING'
 };
 
 export function resolveAIStatus(entity) {
@@ -10,7 +10,7 @@ export function resolveAIStatus(entity) {
   }
 
   const normalized = typeof entity.aiStatus === 'string' ? entity.aiStatus.toUpperCase() : '';
-  if (normalized.includes('FLAG')) return AI_STATUS.FLAGGED;
+  if (normalized.includes('WARN')) return AI_STATUS.WARNING;
   if (normalized.includes('VERIFY')) return AI_STATUS.VERIFIED;
   if (normalized.includes('REVIEW')) return AI_STATUS.REVIEWING;
 
@@ -26,7 +26,7 @@ export function resolveAIStatus(entity) {
   }
 
   const mod = Math.abs(base % 12);
-  if (mod <= 2) return AI_STATUS.FLAGGED;
+  if (mod <= 2) return AI_STATUS.WARNING;
   if (mod <= 6) return AI_STATUS.REVIEWING;
   return AI_STATUS.VERIFIED;
 }

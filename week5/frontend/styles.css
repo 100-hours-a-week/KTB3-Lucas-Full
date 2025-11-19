@@ -527,7 +527,7 @@ body {
   color: var(--danger);
 }
 
-.ai-verdict__badge.is-flagged {
+.ai-verdict__badge.is-warning {
   background: rgba(190, 24, 93, 0.18);
   color: #9f1239;
 }
@@ -1165,6 +1165,54 @@ body {
   gap: 16px;
 }
 
+.board-pagination {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.board-pagination__control {
+  padding: 10px 18px;
+  border-radius: 14px;
+}
+
+.board-pagination__pages {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.board-pagination__page-btn {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 8px 14px;
+  min-width: 44px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-main);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.board-pagination__page-btn.is-active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+[data-theme='dark'] .board-pagination__page-btn {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.board-pagination__info {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
 .board-card {
   background: var(--panel);
   border-radius: 20px;
@@ -1234,7 +1282,7 @@ body {
   color: var(--danger);
 }
 
-.board-card__ai-status.is-flagged {
+.board-card__ai-status.is-warning {
   background: rgba(190, 24, 93, 0.18);
   color: #9f1239;
 }
