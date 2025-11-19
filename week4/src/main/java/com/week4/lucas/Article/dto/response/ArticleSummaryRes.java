@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
-@Schema(description = "게시글 목록 응답")
+@Schema(description = "게시글 목록 응답에 사용할 Summary DTO")
 public record ArticleSummaryRes(
         Long postId,
         String title,

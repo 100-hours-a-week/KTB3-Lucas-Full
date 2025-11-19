@@ -11,6 +11,7 @@ import {
 import { setHelperText, setLoading } from '../utils/dom.js';
 import { navigate } from '../core/router.js';
 import { renderMarkdown } from '../utils/editor.js';
+import { resolveAIStatus, AI_STATUS } from '../utils/ai.js';
 
 const CATEGORY_META = {
   tech: 'Tech Talk',
@@ -18,6 +19,11 @@ const CATEGORY_META = {
   career: '취준생 Talk'
 };
 const CATEGORY_KEYS = Object.keys(CATEGORY_META);
+const AI_MESSAGES = {
+  [AI_STATUS.VERIFIED]: 'TrueDev AI가 내용을 검증했습니다. 기술적인 오류가 확인되지 않았어요.',
+  [AI_STATUS.REVIEWING]: '현재 AI가 내용을 검증하고 있습니다. 커뮤니티 가이드 준수 여부를 확인 중입니다.',
+  [AI_STATUS.FLAGGED]: 'AI가 사실관계나 커뮤니티 가이드 위반 가능성을 감지했습니다. 추가 확인이 필요해요.'
+};
 
 export async function initPostDetailView(container) {
   const articleId = getArticleIdFromQuery();
@@ -185,12 +191,11 @@ function populateAIVerdict(container, article) {
   const messageField = container.querySelector('[data-field="ai-message"]');
   const updatedField = container.querySelector('[data-field="ai-updated"]');
   if (!statusField || !messageField) return;
-  const verified = (article.viewCount ?? 0) % 3 !== 1;
-  statusField.textContent = verified ? 'AI VERIFIED' : 'AI REVIEWING';
-  statusField.classList.toggle('is-reviewing', !verified);
-  messageField.textContent = verified
-    ? 'TrueDev AI가 내용을 검증했습니다. '
-    : '현재 AI가 내용을 검증하고 있습니다. 커뮤니티 가이드에 어긋나지 않는지 확인 중입니다.';
+  const status = resolveAIStatus(article);
+  statusField.textContent = status;
+  statusField.classList.toggle('is-reviewing', status === AI_STATUS.REVIEWING);
+  statusField.classList.toggle('is-flagged', status === AI_STATUS.FLAGGED);
+  messageField.textContent = AI_MESSAGES[status] ?? AI_MESSAGES[AI_STATUS.REVIEWING];
   if (updatedField) {
     updatedField.textContent = formatDate(article.editedAt || article.createdAt || new Date().toISOString());
   }

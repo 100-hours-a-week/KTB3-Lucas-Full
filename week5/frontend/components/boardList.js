@@ -25,7 +25,8 @@ export function renderBoardList(posts, target, template) {
     if (aiNode) {
       const statusText = post.aiStatus ?? 'AI REVIEWING';
       aiNode.textContent = statusText;
-      aiNode.classList.toggle('is-reviewing', statusText.includes('REVIEWING'));
+      aiNode.classList.toggle('is-reviewing', statusText.includes('REVIEW'));
+      aiNode.classList.toggle('is-flagged', statusText.includes('FLAG'));
     }
     node.querySelector('[data-field="likes"]').textContent = post.likeCount ?? 0;
     node.querySelector('[data-field="views"]').textContent = post.viewCount ?? 0;

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ArticleService {
     List<Article> list(int page, int size);
-    Article create(Long userId, ArticleReq.CreateArticleReq req);
+    ArticleDetailRes create(Long userId, ArticleReq.CreateArticleReq req);
     ArticleDetailRes detail(Long userId, Long articleId, boolean increaseViews);
     ArticleDetailRes edit(Long articleId, Long userId, ArticleReq.EditArticleReq req) throws ForbiddenException;
     boolean delete(Long articleId,Long userId);

@@ -1,6 +1,7 @@
 package com.week4.lucas.Comment.controller;
 
 import com.week4.lucas.Article.dto.response.ApiResponse;
+import com.week4.lucas.Comment.dto.response.CommentRes;
 import com.week4.lucas.Comment.mapper.CommentMapper;
 import com.week4.lucas.Comment.service.CommentService;
 import com.week4.lucas.Comment.dto.request.CommentReq;
@@ -39,7 +40,7 @@ public class CommentController {
     // 댓글 작성
     @Operation(summary = "댓글 작성")
     @PostMapping("/articles/{article_id}/comments")
-    public ResponseEntity<Object> createComment(@PathVariable("article_id") Long articleId,
+    public ResponseEntity<ApiResponse<CommentRes>> createComment(@PathVariable("article_id") Long articleId,
                                                 @RequestHeader(value = "Authorization", required = false) String authorization,
                                                 @Valid @RequestBody CommentReq.CreateCommentReq req) {
         Long userId = authTokenResolver.requireUserId(authorization);
@@ -51,10 +52,10 @@ public class CommentController {
     // 댓글 수정
     @Operation(summary = "댓글 수정")
     @PatchMapping("/articles/{article_id}/comments/{comment_id}")
-    public ResponseEntity<Object> editComment(@PathVariable("article_id") Long articleId,
-                                              @PathVariable("comment_id") Long commentId,
-                                              @RequestHeader(value = "Authorization", required = false) String authorization,
-                                              @Valid @RequestBody CommentReq.EditCommentReq req) {
+    public ResponseEntity<ApiResponse<CommentRes>> editComment(@PathVariable("article_id") Long articleId,
+                                                               @PathVariable("comment_id") Long commentId,
+                                                               @RequestHeader(value = "Authorization", required = false) String authorization,
+                                                               @Valid @RequestBody CommentReq.EditCommentReq req) {
         Long userId = authTokenResolver.requireUserId(authorization);
         var res = service.editComment(articleId, commentId, userId, req);
         if (res == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("comment_edited_failed"));
@@ -64,7 +65,7 @@ public class CommentController {
     // 댓글 삭제
     @Operation(summary = "댓글 삭제")
     @DeleteMapping("/articles/{article_id}/comments/{comment_id}")
-    public ResponseEntity<Object> deleteComment(@PathVariable("article_id") Long articleId,
+    public ResponseEntity<ApiResponse<Void>> deleteComment(@PathVariable("article_id") Long articleId,
                                                 @PathVariable("comment_id") Long commentId,
                                                 @RequestHeader(value = "Authorization", required = false) String authorization) {
         Long userId = authTokenResolver.requireUserId(authorization);

@@ -13,6 +13,29 @@
         </div>
         <button class="primary-button" type="button" data-link data-route="compose">게시글 작성</button>
       </div>
+      <div class="board-hero__stats" aria-label="실시간 AI 검증 통계">
+        <div class="board-hero__stats-header">
+          <h3>실시간 AI 검증 통계</h3>
+        </div>
+        <div class="board-hero__stats-grid">
+          <div class="board-stat">
+            <strong data-role="board-stat-verified">0</strong>
+            <span>AI 검증 통과 게시글</span>
+          </div>
+          <div class="board-stat">
+            <strong data-role="board-stat-pending">0</strong>
+            <span>검증 대기 중</span>
+          </div>
+          <div class="board-stat">
+            <strong data-role="board-stat-failed">0</strong>
+            <span>검증 실패</span>
+          </div>
+          <div class="board-stat">
+            <strong data-role="board-stat-members">0</strong>
+            <span>가입자 수</span>
+          </div>
+        </div>
+      </div>
     </section>
     <div class="board-list" id="boardList" aria-live="polite"></div>
   </div>

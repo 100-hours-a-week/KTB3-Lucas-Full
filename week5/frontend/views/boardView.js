@@ -2,6 +2,7 @@ import { fetchArticles } from '../api/articles.js';
 import { renderBoardList, showBoardMessage } from '../components/boardList.js';
 import { getState } from '../state/store.js';
 import { navigate } from '../core/router.js';
+import { resolveAIStatus, AI_STATUS } from '../utils/ai.js';
 
 const CATEGORY_META = {
   tech: {
@@ -34,6 +35,12 @@ export function initBoardView(container) {
   const greeting = container.querySelector('[data-role="board-greeting"]');
   const sub = container.querySelector('[data-role="board-sub"]');
   const tabContainer = container.querySelector('[data-role="category-tabs"]');
+  const statsNodes = {
+    verified: container.querySelector('[data-role="board-stat-verified"]'),
+    pending: container.querySelector('[data-role="board-stat-pending"]'),
+    failed: container.querySelector('[data-role="board-stat-failed"]'),
+    members: container.querySelector('[data-role="board-stat-members"]')
+  };
   if (!list || !template) return;
 
   if (tabContainer) {
@@ -66,16 +73,17 @@ export function initBoardView(container) {
     navigate('post');
   });
 
-  loadArticles(list, template, tabContainer);
+  loadArticles(list, template, tabContainer, statsNodes);
 }
 
-async function loadArticles(list, template, tabContainer) {
+async function loadArticles(list, template, tabContainer, statsNodes) {
   showBoardMessage(list, '게시글을 불러오는 중입니다...');
   try {
     const response = await fetchArticles();
     const posts = Array.isArray(response.data) ? response.data : [];
     cachedPosts = posts.map(enhancePostMetadata);
     if (tabContainer) updateCategoryTabs(tabContainer);
+    updateBoardStats(statsNodes);
     renderCurrentCategory(list, template);
   } catch (error) {
     showBoardMessage(list, error.message || '게시글을 불러오지 못했습니다.');
@@ -85,12 +93,12 @@ async function loadArticles(list, template, tabContainer) {
 function enhancePostMetadata(post) {
   const baseId = typeof post.postId === 'number' ? post.postId : Math.floor(Math.random() * 999);
   const categoryKey = CATEGORY_KEYS[baseId % CATEGORY_KEYS.length];
-  const aiVerified = (post.viewCount ?? 0) % 3 !== 1;
+  const aiStatus = resolveAIStatus(post);
   return {
     ...post,
     categoryKey,
     categoryLabel: CATEGORY_META[categoryKey].label,
-    aiStatus: aiVerified ? 'AI VERIFIED' : 'AI REVIEWING'
+    aiStatus
   };
 }
 
@@ -124,4 +132,26 @@ function renderCurrentCategory(list, template) {
     return;
   }
   renderBoardList(filtered, list, template);
+}
+
+function updateBoardStats(statsNodes = {}) {
+  if (!statsNodes) return;
+  const totals = cachedPosts.reduce(
+    (acc, post) => {
+      const status = resolveAIStatus(post);
+      if (status === AI_STATUS.VERIFIED) acc.verified += 1;
+      else if (status === AI_STATUS.FLAGGED) acc.failed += 1;
+      else acc.pending += 1;
+      return acc;
+    },
+    { verified: 0, pending: 0, failed: 0 }
+  );
+  if (statsNodes.verified) statsNodes.verified.textContent = totals.verified.toString();
+  if (statsNodes.pending) statsNodes.pending.textContent = totals.pending.toString();
+  if (statsNodes.failed) statsNodes.failed.textContent = totals.failed.toString();
+  if (statsNodes.members) {
+    const memberCount =
+      cachedPosts.length > 0 ? cachedPosts.length * 8 + 300 + Math.floor(Math.random() * 45) : 320;
+    statsNodes.members.textContent = memberCount.toString();
+  }
 }

@@ -42,10 +42,11 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Transactional
     @Override
-    public Article create(Long userId, ArticleReq.CreateArticleReq req) {
+    public ArticleDetailRes create(Long userId, ArticleReq.CreateArticleReq req) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-        return articleRepo.save(ArticleMapper.toEntity(user, req));
+        Article article = articleRepo.save(ArticleMapper.toEntity(user, req));
+        return ArticleMapper.toArticleDetail(article,false,true);
     }
     @Transactional
     @Override

@@ -1,6 +1,6 @@
 package com.week4.lucas.Exception;
 
-import com.week4.lucas.User.dto.response.ApiResponse;
+import com.week4.lucas.base.dto.response.ApiResponse;
 import com.week4.lucas.User.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -4,6 +4,7 @@ export function initHomeView(container) {
   const greeting = container.querySelector('[data-role="home-greeting"]');
   const statPosts = container.querySelector('[data-role="stat-posts"]');
   const statReviews = container.querySelector('[data-role="stat-reviews"]');
+  const statFailed = container.querySelector('[data-role="stat-failed"]');
   const statMembers = container.querySelector('[data-role="stat-members"]');
   const { user } = getState();
 
@@ -16,5 +17,6 @@ export function initHomeView(container) {
 
   if (statPosts) statPosts.textContent = (Math.floor(Math.random() * 50) + 120).toString();
   if (statReviews) statReviews.textContent = (Math.floor(Math.random() * 10) + 5).toString();
-  if (statMembers) statMembers.textContent = (Math.floor(Math.random() * 30) + 340).toString();
+  if (statFailed) statFailed.textContent = (Math.floor(Math.random() * 6) + 2).toString();
+  if (statMembers) statMembers.textContent = (Math.floor(Math.random() * 80) + 420).toString();
 }

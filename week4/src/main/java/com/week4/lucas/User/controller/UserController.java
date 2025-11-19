@@ -1,6 +1,6 @@
 package com.week4.lucas.User.controller;
 
-import com.week4.lucas.User.dto.response.ApiResponse;
+import com.week4.lucas.base.dto.response.ApiResponse;
 import com.week4.lucas.User.dto.request.LoginRequest;
 import com.week4.lucas.User.dto.request.UserReq;
 import com.week4.lucas.User.dto.request.AccountUpdateReq;
@@ -8,7 +8,6 @@ import com.week4.lucas.User.dto.response.LoginSuccess;
 import com.week4.lucas.User.dto.response.LoginUser;
 import com.week4.lucas.User.dto.response.SignupResult;
 import com.week4.lucas.User.dto.response.AccountUpdateRes;
-import com.week4.lucas.User.entity.User;
 import com.week4.lucas.User.service.UserService;
 import com.week4.lucas.User.support.AuthTokenResolver;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,13 +52,13 @@ public class UserController {
     // 로그인
     @Operation(summary = "로그인")
     @PostMapping("/login")
-    public ResponseEntity<LoginSuccess> login(@Valid @RequestBody LoginRequest req) {
+    public ResponseEntity<ApiResponse<LoginSuccess>> login(@Valid @RequestBody LoginRequest req) {
         // 실패시 UnauthorizedException
         String token = UUID.randomUUID().toString().replace("-", ""); // 토큰생성
 
         LoginUser user = service.login(req.email(), req.password(),token);
 
-        return ResponseEntity.ok(new LoginSuccess("login_success", token, user));
+        return ResponseEntity.ok(ApiResponse.ok("login_success",new LoginSuccess(token, user)));
     }
 
 

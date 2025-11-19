@@ -1,5 +1,6 @@
 package com.week4.lucas.Article.controller;
 
+import com.week4.lucas.Article.dto.response.ArticleDetailRes;
 import com.week4.lucas.Article.mapper.ArticleMapper;
 import com.week4.lucas.Article.service.ArticleService;
 import com.week4.lucas.Article.dto.request.ArticleReq;
@@ -25,7 +26,7 @@ public class ArticleController {
 
 
 
-    // 목록
+    // 특정 페이지 목록
     @Operation(summary = "특정 페이지 게시글 목록 불러오기")
     @GetMapping("/articles")
     public ResponseEntity<Object> getArticleList(@RequestParam(defaultValue = "1") int page) {
@@ -38,8 +39,8 @@ public class ArticleController {
     // 작성
     @Operation(summary = "글 작성")
     @PostMapping("/articles")
-    public ResponseEntity<Object> create(@RequestHeader(value = "Authorization", required = false) String authorization,
-                                         @Valid @RequestBody ArticleReq.CreateArticleReq req) {
+    public ResponseEntity<ApiResponse<ArticleDetailRes>> create(@RequestHeader(value = "Authorization", required = false) String authorization,
+                                                                @Valid @RequestBody ArticleReq.CreateArticleReq req) {
         Long userId = authTokenResolver.requireUserId(authorization);
         var a = service.create(userId, req);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("post_created_success", a));
@@ -48,7 +49,7 @@ public class ArticleController {
     // 상세
     @Operation(summary = "게시글 조회")
     @GetMapping("/articles/{article_id}")
-    public ResponseEntity<Object> detail(@RequestHeader(value = "Authorization", required = false) String authorization,
+    public ResponseEntity<ApiResponse<ArticleDetailRes>> detail(@RequestHeader(value = "Authorization", required = false) String authorization,
                                          @PathVariable("article_id") Long articleId) {
         Long userId = authTokenResolver.resolveUserIdIfPresent(authorization);
         var article = service.detail(userId, articleId, true);
@@ -60,7 +61,7 @@ public class ArticleController {
     // 수정
     @Operation(summary = "게시글 수정")
     @PatchMapping("/articles/{article_id}")
-    public ResponseEntity<Object> edit(@PathVariable("article_id") Long id,
+    public ResponseEntity<ApiResponse<ArticleDetailRes>> edit(@PathVariable("article_id") Long id,
                                        @RequestHeader(value = "Authorization", required = false) String authorization,
                                        @Valid @RequestBody ArticleReq.EditArticleReq req) {
         try {
@@ -77,7 +78,7 @@ public class ArticleController {
     // 삭제
     @Operation(summary = "게시글 삭제")
     @DeleteMapping("/articles/{article_id}")
-    public ResponseEntity<Object> delete(@PathVariable("article_id") Long articleId,
+    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("article_id") Long articleId,
                                          @RequestHeader(value = "Authorization", required = false) String authorization) {
        try{
            Long userId = authTokenResolver.requireUserId(authorization);
@@ -95,7 +96,7 @@ public class ArticleController {
     // 좋아요
     @Operation(summary = "좋아요")
     @PostMapping("/articles/{article_id}/likes")
-    public ResponseEntity<Object> like(@PathVariable("article_id") Long article_id,
+    public ResponseEntity<ApiResponse<Void>> like(@PathVariable("article_id") Long article_id,
                                        @RequestHeader(value = "Authorization", required = false) String authorization)
     {
         Long userId = authTokenResolver.requireUserId(authorization);
@@ -108,7 +109,7 @@ public class ArticleController {
 
     @Operation(summary = "좋아요 취소")
     @DeleteMapping("/articles/{article_id}/likes")
-    public ResponseEntity<Object> unlike(@PathVariable("article_id") Long article_id,
+    public ResponseEntity<ApiResponse<Void>> unlike(@PathVariable("article_id") Long article_id,
                                          @RequestHeader(value = "Authorization", required = false) String authorization) {
         Long userId = authTokenResolver.requireUserId(authorization);
         boolean a = service.unlike(article_id, userId);
